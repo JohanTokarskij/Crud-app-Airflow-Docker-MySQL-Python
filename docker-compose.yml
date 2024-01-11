@@ -1,65 +1,58 @@
-version: '1'
+version: '3.1'
 
 services:
   mysql:
     image: mysql:latest
     environment:
-      - MYSQL_DATABASE=bitnami_airflow
-      - MYSQL_ROOT_PASSWORD=password
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: users
     ports:
       - "3306:3306"
     volumes:
-      - 'mysql_data:/var/lib/mysql'
+      - mysql_data:/var/lib/mysql
 
   mongodb:
-    image: mongo
+    image: mongo:latest
     environment:
-      - MONGO_INITDB_ROOT_USERNAME=mongoadmin
-      - MONGO_INITDB_ROOT_PASSWORD=mongopassword
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: mongopassword
     ports:
       - "27017:27017"
     volumes:
-      - 'mongodb_data:/data/db'
+      - mongodb_data:/data/db
 
-  redis:
-    image: docker.io/bitnami/redis:7.0
+  airflow-webserver:
+    image: apache/airflow:latest
     environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-    volumes:
-      - 'redis_data:/bitnami'
-
-  airflow-scheduler:
-    image: docker.io/bitnami/airflow-scheduler:2
-    environment:
-      - AIRFLOW_DATABASE_NAME=bitnami_airflow
-      - AIRFLOW_DATABASE_USERNAME=root
-      - AIRFLOW_DATABASE_PASSWORD=password
-      - AIRFLOW_EXECUTOR=CeleryExecutor
-      - AIRFLOW_WEBSERVER_HOST=airflow
-
-  airflow-worker:
-    image: docker.io/bitnami/airflow-worker:2
-    environment:
-      - AIRFLOW_DATABASE_NAME=bitnami_airflow
-      - AIRFLOW_DATABASE_USERNAME=root
-      - AIRFLOW_DATABASE_PASSWORD=password
-      - AIRFLOW_EXECUTOR=CeleryExecutor
-      - AIRFLOW_WEBSERVER_HOST=airflow
-
-  airflow:
-    image: docker.io/bitnami/airflow:2
-    environment:
-      - AIRFLOW_DATABASE_NAME=bitnami_airflow
-      - AIRFLOW_DATABASE_USERNAME=root
-      - AIRFLOW_DATABASE_PASSWORD=password
-      - AIRFLOW_EXECUTOR=CeleryExecutor
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__WEBSERVER__SECRET_KEY=super_secret_key
+      - _AIRFLOW_WWW_USER_USERNAME=admin
+      - _AIRFLOW_WWW_USER_PASSWORD=admin
     ports:
-      - '8080:8080'
+      - "8080:8080"
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    command: bash -c "airflow db init && airflow webserver"
+
+  
+  airflow-scheduler:
+    image: apache/airflow:latest
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+    depends_on:
+      - mysql
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - ./logs:/opt/airflow/logs
+      - ./plugins:/opt/airflow/plugins
+    command: bash -c "airflow db init && airflow scheduler"
 
 volumes:
   mysql_data:
-    driver: local
-  redis_data:
     driver: local
   mongodb_data:
     driver: local
