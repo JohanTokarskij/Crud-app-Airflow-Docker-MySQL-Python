@@ -5,7 +5,7 @@ services:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_DATABASE: users
+      MYSQL_DATABASE: airflow
     ports:
       - "3306:3306"
     volumes:
@@ -24,32 +24,35 @@ services:
   airflow-webserver:
     image: apache/airflow:latest
     environment:
-      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=mysql+mysqlconnector://root:password@mysql:3306/airflow
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__WEBSERVER__SECRET_KEY=super_secret_key
       - _AIRFLOW_WWW_USER_USERNAME=admin
-      - _AIRFLOW_WWW_USER_PASSWORD=admin
+      - _AIRFLOW_WWW_USER_PASSWORD=password
     ports:
       - "8080:8080"
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-    command: bash -c "airflow db init && airflow webserver"
+    depends_on:
+      - mysql
+    command: bash -c "airflow db upgrade && airflow users create --username admin --password password --firstname Admin --lastname User --role Admin --email admin@example.com && airflow webserver"
 
-  
   airflow-scheduler:
     image: apache/airflow:latest
     environment:
-      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
+      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=mysql+mysqlconnector://root:password@mysql:3306/airflow
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
-    depends_on:
-      - mysql
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
       - ./plugins:/opt/airflow/plugins
-    command: bash -c "airflow db init && airflow scheduler"
+    depends_on:
+      - mysql
+    command: bash -c "airflow db upgrade && airflow scheduler"
 
 volumes:
   mysql_data:
