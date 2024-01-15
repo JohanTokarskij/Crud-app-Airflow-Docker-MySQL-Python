@@ -41,7 +41,6 @@ def create_database_and_table(db_connection):
     except pymysql.Error as e:
         print(f"Error while creating database or table: {e}")
 
-
 def create_user(db_connection):
     try:
         first_name = input('Enter first name: ')
@@ -49,8 +48,7 @@ def create_user(db_connection):
         address = input('Enter your address: ')
 
         while True:
-            phone_number = input(
-                'Enter phone number (or type "exit" to cancel): ')
+            phone_number = input('Enter phone number (or type "exit" to cancel): ')
             if phone_number.lower() == 'exit':
                 print('User creation cancelled.')
                 return
@@ -64,21 +62,18 @@ def create_user(db_connection):
 
             try:
                 with db_connection.cursor() as cursor:
-                    cursor.execute(
-                        'SELECT COUNT(*) FROM users WHERE username=%s', (username,))
+                    cursor.execute('SELECT COUNT(*) FROM users WHERE username=%s', (username,))
                     result = cursor.fetchone()
 
                     if result['COUNT(*)'] > 0:
-                        print(
-                            'This username already exists. Please enter a different username.')
+                        print('This username already exists. Please enter a different username.')
                     else:
                         break
             except pymysql.Error as e:
                 print(f'Database error occurred: {e}')
 
         while True:
-            password = getpass(
-                'Enter new password (or leave blank to cancel): ')
+            password = getpass('Enter new password (or leave blank to cancel): ')
             if password == '':
                 print('User creation cancelled.')
                 return
@@ -113,6 +108,7 @@ def create_user(db_connection):
                 print('User created successfully.')
         else:
             print('User creatiion canceled. No new user has been added.')
+
 
     except pymysql.Error as e:
         print(f'Database error occurred: {e}')
