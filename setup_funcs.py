@@ -1,12 +1,13 @@
 import pymysql
 
+
 def initiate_databases_and_tables():
     try:
         with pymysql.connect(user='root',
-            password='password',
-            host='localhost',
-            port=3306,
-            cursorclass=pymysql.cursors.DictCursor) as connect:
+                             password='password',
+                             host='localhost',
+                             port=3306,
+                             cursorclass=pymysql.cursors.DictCursor) as connect:
             with connect.cursor() as cursor:
                 cursor.execute('CREATE DATABASE IF NOT EXISTS airflow')
                 cursor.execute("CREATE DATABASE IF NOT EXISTS crud_app")
