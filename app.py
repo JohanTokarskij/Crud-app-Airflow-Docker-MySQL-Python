@@ -1,4 +1,4 @@
-from pymysql_funcs import establish_mysql_connection, create_database_and_table
+from pymysql_funcs import establish_mysql_connection
 from pymongo_funcs import establish_mongobd_connection
 from menus import initial_menu
 
@@ -7,7 +7,6 @@ def main():
         mysql_connection = establish_mysql_connection()
         mongodb_connection, posts = establish_mongobd_connection()
         if mysql_connection and mongodb_connection:
-            create_database_and_table(mysql_connection)
             initial_menu(mysql_connection)
     except:
         pass

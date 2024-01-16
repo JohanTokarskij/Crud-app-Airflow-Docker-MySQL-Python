@@ -19,13 +19,13 @@ def establish_mysql_connection():
         return None
 
 
-def create_database_and_table(db_connection):
+""" def create_database_and_table(db_connection):
     try:
         with db_connection.cursor() as cursor:
             cursor.execute("CREATE DATABASE IF NOT EXISTS crud_app")
             db_connection.select_db('crud_app')
 
-            create_table_query = """
+            create_table_query = '''
             CREATE TABLE IF NOT EXISTS users (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 first_name VARCHAR(255),
@@ -35,11 +35,11 @@ def create_database_and_table(db_connection):
                 address VARCHAR(255),
                 phone_number VARCHAR(255)
             )
-            """
+            '''
             cursor.execute(create_table_query)
         db_connection.commit()
     except pymysql.Error as e:
-        print(f"Error while creating database or table: {e}")
+        print(f"Error while creating database or table: {e}") """
 
 def create_user(db_connection):
     try:
@@ -62,6 +62,7 @@ def create_user(db_connection):
 
             try:
                 with db_connection.cursor() as cursor:
+                    db_connection.select_db('crud_app')
                     cursor.execute('SELECT COUNT(*) FROM users WHERE username=%s', (username,))
                     result = cursor.fetchone()
 
