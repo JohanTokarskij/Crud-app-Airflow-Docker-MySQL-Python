@@ -1,5 +1,5 @@
 import pymysql
-from pymysql_funcs import create_user
+from pymysql_funcs import create_user, login
 
 
 def initial_menu(db_connection):
@@ -16,7 +16,8 @@ def initial_menu(db_connection):
         elif choice == '2':
             username = login(db_connection)
             if username:
-                authenticated_menu(db_connection, username)
+                print('authenticated_menu')
+                #authenticated_menu(db_connection, username)
         elif choice == '3':
             print("Exiting the application.")
             break
