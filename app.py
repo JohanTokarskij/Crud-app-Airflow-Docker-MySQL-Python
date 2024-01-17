@@ -7,12 +7,16 @@ def main():
         mysql_connection = establish_mysql_connection()
         mongodb_connection, posts = establish_mongobd_connection()
         if mysql_connection and mongodb_connection:
-            initial_menu(mysql_connection)
+            initial_menu(mysql_connection, posts)
     except:
         pass
     finally:
-        mysql_connection.close()
-        mongodb_connection.close()
+        if mysql_connection:
+            mysql_connection.close()
+            print('MySQL connection has been terminated.')
+        if mongodb_connection:
+            mongodb_connection.close()
+            print('MongoDB connection has been terminated.')
 
 
 if __name__ == '__main__':

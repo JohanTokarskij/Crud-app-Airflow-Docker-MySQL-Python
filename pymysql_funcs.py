@@ -2,7 +2,7 @@ import pymysql
 import bcrypt
 from getpass import getpass
 
-
+# Database Connection #
 def establish_mysql_connection():
     try:
         connection = pymysql.connect(
@@ -20,6 +20,7 @@ def establish_mysql_connection():
         return None
 
 
+# User Creation Functions #
 def create_user(db_connection):
     try:
         first_name = get_input('Enter first name (or type "exit" to cancel): ')
@@ -132,6 +133,7 @@ def get_password():
             print('Passwords do not match.')
 
 
+# User Authentication Functions #
 def login(db_connection):
     username = input(
         "Enter your username (or type 'exit' to cancel): ").strip()
@@ -166,3 +168,4 @@ def login(db_connection):
         print(f"An error occurred: {e}")
 
     return None
+
