@@ -26,7 +26,7 @@ def post_message(posts, username):
     file_data = None
     if files:
         file_name = files[0]
-        to_upload = input(f"Found '{file_name}' in .\Uploads. Upload and remove it? (y/n): ")
+        to_upload = input(f"Found '{file_name}' in Uploads. Upload and remove it? (y/n): ")
         if to_upload == 'y':
             file_path = os.path.join(upload_folder, file_name)
 
