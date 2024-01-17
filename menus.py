@@ -1,10 +1,18 @@
 from pymysql_funcs import create_user, login
 from pymongo_funcs import post_message, search_messages
+import os
+import platform
+
+def clear_screen():
+    if platform.system() == "Windows":
+        os.system('cls')
+    else:
+        os.system('clear')
 
 
 def initial_menu(db_connection, mongodb_connection):
     while True:
-        print("\nMenu:")
+        print("\n\nMenu:")
         print("1. Create User")
         print("2. Login")
         print("3. Exit")

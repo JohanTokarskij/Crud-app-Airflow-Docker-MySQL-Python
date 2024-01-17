@@ -6,8 +6,7 @@ import base64
 
 def establish_mongobd_connection():
     try:
-        client = MongoClient(
-            'mongodb://mongoadmin:mongopassword@localhost:27017')
+        client = MongoClient('mongodb://mongoadmin:mongopassword@localhost:27017')
         db = client['posts_db']
         posts = db['posts']
         print('Connection to MongoDB is successful')
@@ -18,11 +17,8 @@ def establish_mongobd_connection():
 
 
 def post_message(posts, username):
-    title = input("Enter the title of your post: ")
-    message = input("Enter your message: ")
-
-    print("Checking 'Upload' folder for any files to attach...")
-    input("Press any key to continue...")
+    title = input('Enter the title of your post: ')
+    message = input('Enter your message: ')
 
     upload_folder = './Uploads'
     files = os.listdir(upload_folder)
@@ -30,19 +26,21 @@ def post_message(posts, username):
     file_data = None
     if files:
         file_name = files[0]
-        file_path = os.path.join(upload_folder, file_name)
+        to_upload = input(f"Found '{file_name}' in .\Uploads. Upload and remove it? (y/n): ")
+        if to_upload == 'y':
+            file_path = os.path.join(upload_folder, file_name)
 
-        with open(file_path, "rb") as file:
-            file_content = file.read()
-            encoded_content = base64.b64encode(file_content).decode('utf-8')
+            with open(file_path, "rb") as file:
+                file_content = file.read()
+                encoded_content = base64.b64encode(file_content).decode('utf-8')
 
-        file_data = {
-            'base64': encoded_content,
-            'name': os.path.splitext(file_name)[0],
-            'extension': os.path.splitext(file_name)[1]
-        }
+            file_data = {
+                'base64': encoded_content,
+                'name': os.path.splitext(file_name)[0],
+                'extension': os.path.splitext(file_name)[1]
+            }
 
-        os.remove(file_path)
+            os.remove(file_path)
 
     post_document = {
         'username': username,
@@ -53,20 +51,27 @@ def post_message(posts, username):
 
     posts.insert_one(post_document)
 
-    print("Post created successfully.")
+    print('Post created successfully.')
 
 
 def search_messages(posts, username):
-    search_query = input("Enter a keyword to search in messages: ")
+    search_query = input('Enter a keyword to search in messages: ')
 
     results = posts.find({
         'username': username,
         'title': {'$regex': search_query, '$options': 'i'}
     })
 
-    print(f"\nSearch results for '{search_query}':")
+    print(f'\nSearch results for "{search_query}":')
     for post in results:
-        print(f'Username: {post['username']}')
-        print(f"Title: {post['title']}")
-        print(f"Message: {post['message']}")
+        print(f'Username: {post["username"]}')
+        print(f'Title: {post["title"]}')
+        print(f'Message: {post["message"]}')
+
+        if 'file' in post and post["file"] is not None:
+            print(f'File Name: {post["file"].get("name", "N/A")}{post["file"].get("extension", "N/A")}')
+        else:
+            print('File: None')
+
         print("---------------------------------------------------")
+
