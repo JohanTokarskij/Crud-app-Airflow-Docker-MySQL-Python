@@ -21,7 +21,7 @@ def initiate_databases_and_tables():
                     username VARCHAR(255) UNIQUE,
                     password VARCHAR(255),
                     address VARCHAR(255),
-                    phone_number VARCHAR(255)
+                    phone_number INT(255)
                 )
                 """
                 cursor.execute(create_table_query)
