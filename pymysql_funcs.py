@@ -20,49 +20,14 @@ def establish_mysql_connection():
         return None
 
 
-# User Creation Functions #
+# User account creation/modification Functions #
 def create_user(db_connection):
     try:
-        first_name = get_input('Enter first name (or type "exit" to cancel): ')
-        if first_name is None:
+        user_info = get_user_info(db_connection)
+        if user_info is None:
             return
 
-        last_name = get_input('Enter last name (or type "exit" to cancel): ')
-        if last_name is None:
-            return
-
-        address = get_input('Enter your address (or type "exit" to cancel): ')
-        if address is None:
-            return
-
-        phone_number = get_input(
-            'Enter phone number (or type "exit" to cancel): ', is_phone=True)
-        if phone_number is None:
-            return
-
-        username = get_unique_username(db_connection)
-        if username is None:
-            return
-
-        password = get_password()
-        if password is None:
-            return
-
-        hashed_password = bcrypt.hashpw(
-            password.encode('utf-8'), bcrypt.gensalt())
-
-        print(f"""\nSummary:
-              First name: {first_name}
-              Last name: {last_name}
-              Address: {address}
-              Phone number: {phone_number}
-              Username: {username}""")
-
-        confirm_creation = get_input(
-            '\nProceed with creating a user? (y/n): ', is_confirm=True)
-        if confirm_creation is None or confirm_creation.lower() != 'y':
-            print('User creation canceled. No new user has been added.')
-            return
+        first_name, last_name, address, phone_number, username, hashed_password = user_info
 
         with db_connection.cursor() as cursor:
             insert_query = """
@@ -77,6 +42,76 @@ def create_user(db_connection):
         print(f'Database error occurred: {e}')
     except Exception as e:
         print(f'An error occurred: {e}')
+
+def update_user_details(db_connection, username):
+    try:
+        user_info = get_user_info(db_connection, is_create=False)
+        if user_info is None:
+            return
+
+        first_name, last_name, address, phone_number, _, hashed_password = user_info
+
+        with db_connection.cursor() as cursor:
+            update_query = """UPDATE users SET first_name=%s, last_name=%s, password=%s, address=%s, phone_number=%s
+                            WHERE username=%s"""
+            cursor.execute(update_query, (first_name, last_name, hashed_password, address, phone_number, username))
+            db_connection.commit()
+            print('User details updated successfully.')
+
+    except pymysql.Error as e:
+        print(f'Database error occurred: {e}')
+    except Exception as e:
+        print(f'An error occurred: {e}')
+
+
+def get_user_info(db_connection, is_create=True):
+    try:
+        first_name = get_input('Enter first name (or type "exit" to cancel): ')
+        if first_name is None:
+            return None
+
+        last_name = get_input('Enter last name (or type "exit" to cancel): ')
+        if last_name is None:
+            return None
+
+        address = get_input('Enter your address (or type "exit" to cancel): ')
+        if address is None:
+            return None
+
+        phone_number = get_input('Enter phone number (or type "exit" to cancel): ', is_phone=True)
+        if phone_number is None:
+            return None
+
+        username = None
+        if is_create:
+            username = get_unique_username(db_connection)
+            if username is None:
+                return None
+
+        password = get_password()
+        if password is None:
+            return None
+
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+
+        action = 'creating' if is_create else 'updating'
+        print(f"""\nSummary:
+              First name: {first_name}
+              Last name: {last_name}
+              Address: {address}
+              Phone number: {phone_number}
+              Username: {username if username else '[Not Changed]'}""")
+
+        confirm = get_input(f'\nProceed with {action} a user? (y/n): ', is_confirm=True)
+        if confirm is None or confirm.lower() != 'y':
+            print(f'User {action} canceled. No changes have been made.')
+            return None
+
+        return first_name, last_name, address, phone_number, username, hashed_password
+
+    except Exception as e:
+        print(f'An error occurred: {e}')
+        return None
 
 
 def get_input(prompt, is_phone=False, is_confirm=False):

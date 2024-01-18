@@ -58,7 +58,6 @@ def search_messages(posts, username):
     search_query = input('Enter a keyword to search in messages: ')
 
     results = posts.find({
-        'username': username,
         'title': {'$regex': search_query, '$options': 'i'}
     })
 

@@ -1,4 +1,4 @@
-from pymysql_funcs import create_user, login
+from pymysql_funcs import create_user, login, update_user_details
 from pymongo_funcs import post_message, search_messages
 import os
 import platform

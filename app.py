@@ -1,6 +1,6 @@
 from pymysql_funcs import establish_mysql_connection
 from pymongo_funcs import establish_mongobd_connection
-from menus import initial_menu, clear_screen
+from menus import initial_menu
 
 def main():
     mysql_connection = None
@@ -10,7 +10,6 @@ def main():
         mysql_connection = establish_mysql_connection()
         mongodb_connection, posts = establish_mongobd_connection()
         if mysql_connection and mongodb_connection:
-            clear_screen()
             initial_menu(mysql_connection, posts)
     except Exception as e:
         print(f"An error occurred: {e}")
