@@ -54,8 +54,8 @@ def post_message(posts, username):
     print('Post created successfully.')
 
 
-def search_messages(posts, username):
-    search_query = input('Enter a keyword to search in messages: ')
+def search_messages(posts):
+    search_query = input('Enter a keyword in the title: ')
 
     results = posts.find({
         'title': {'$regex': search_query, '$options': 'i'}
@@ -74,3 +74,12 @@ def search_messages(posts, username):
 
         print("---------------------------------------------------")
 
+
+def view_message_statistics(posts):
+    search_query = input('Enter a username: ')
+
+    result = posts.count_documents({
+        'username': search_query
+    })
+
+    print(f'User "{search_query}" has posted {result} times.')

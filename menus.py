@@ -1,5 +1,5 @@
 from pymysql_funcs import create_user, login, update_user_details
-from pymongo_funcs import post_message, search_messages
+from pymongo_funcs import post_message, search_messages, view_message_statistics
 import os
 import platform
 
@@ -46,9 +46,9 @@ def authenticated_menu(db_connection, posts, username):
         if choice == '1':
             post_message(posts, username)
         elif choice == '2':
-            search_messages(posts, username)
+            search_messages(posts)
         elif choice == '3':
-            view_message_statistics(mongodb_connection, username)
+            view_message_statistics(posts)
         elif choice == '4':
             update_user_details(db_connection, username)
         elif choice == '5':
