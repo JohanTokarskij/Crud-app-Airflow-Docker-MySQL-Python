@@ -1,6 +1,14 @@
 import pymysql
 import bcrypt
 from getpass import getpass
+import logging
+
+logging.basicConfig(
+    filename='logs/user_login.csv',
+    level=logging.INFO,
+    format='%(message)s, %(asctime)s',
+    datefmt='%Y, %m, %d, %H'
+)
 
 
 # MySQL Database Connection #
@@ -14,7 +22,7 @@ def establish_mysql_connection():
             database='crud_app',
             cursorclass=pymysql.cursors.DictCursor
         )
-        print("Connection to MySQL is successful")
+        print('Connection to MySQL is successful')
         return connection
     except pymysql.Error as e:
         print(f'Error connecting to MySQL: {e}')
@@ -49,32 +57,33 @@ def create_user(db_connection):
 def login(db_connection):
     try:
         username = input(
-            "Enter your username (or type 'exit' to cancel): ").strip()
+            'Enter your username (or type "exit" to cancel): ').strip()
         if username.lower() == 'exit':
-            print("Login cancelled.")
+            print('Login cancelled.')
             return None
 
-        password = getpass("Enter your password (or type 'exit' to cancel): ")
+        password = getpass('Enter your password (or type "exit" to cancel): ')
         if password.lower() == 'exit':
-            print("Login cancelled.")
+            print('Login cancelled.')
             return None
 
         if verify_password(db_connection, username, password):
-            print("Login successful!")
+            print('Login successful!')
+            logging.info(f'{username}')
             return username
         else:
             return None
     except pymysql.Error  as e:
-        print(f"Database error occurred: {e}")
+        print(f'Database error occurred: {e}')
         return None
     except Exception as e:
-        print(f"An unexpected error occurred: {e}")
+        print(f'An unexpected error occurred: {e}')
         return None
     
 
 # Authenticated Menu: Update User Details #
 def update_user_details(db_connection, username):
-    current_password = getpass("Enter your current password: ")
+    current_password = getpass('Enter your current password: ')
     if not verify_password(db_connection, username, current_password):
         return
     try:
@@ -216,20 +225,20 @@ def verify_password(db_connection, username, password):
             result = cursor.fetchone()
 
             if not result:
-                print("Username not found.")
+                print('Username not found.')
                 return False
             hashed_password = result['password']
             if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
                 return True
             else:
-                print("Incorrect password.")
+                print('Incorrect password.')
                 return False
       
     except pymysql.Error as e:
-        print(f"Database error occurred: {e}")
+        print(f'Database error occurred: {e}')
         return False
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f'An error occurred: {e}')
         return False
 
 
