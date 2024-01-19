@@ -1,13 +1,5 @@
 from pymysql_funcs import create_user, login, update_user_details
 from pymongo_funcs import post_message, search_messages, view_message_statistics
-import os
-import platform
-
-def clear_screen():
-    if platform.system() == "Windows":
-        os.system('cls')
-    else:
-        os.system('clear')
 
 
 def initial_menu(db_connection, mongodb_connection):
@@ -37,7 +29,7 @@ def authenticated_menu(db_connection, posts, username):
         print("\nAuthenticated Menu:")
         print("1. Post a Message")
         print("2. Search Messages")
-        print("3. View My Message Statistics")
+        print("3. View Message Statistics")
         print("4. Update User Details")
         print("5. Logout")
 

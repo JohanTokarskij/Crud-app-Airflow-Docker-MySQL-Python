@@ -2,7 +2,8 @@ import pymysql
 import bcrypt
 from getpass import getpass
 
-# Database Connection #
+
+# MySQL Database Connection #
 def establish_mysql_connection():
     try:
         connection = pymysql.connect(
@@ -20,7 +21,7 @@ def establish_mysql_connection():
         return None
 
 
-# User account creation/modification Functions #
+# Menu: 1.Create User #
 def create_user(db_connection):
     try:
         user_info = get_user_info(db_connection)
@@ -43,7 +44,39 @@ def create_user(db_connection):
     except Exception as e:
         print(f'An error occurred: {e}')
 
+
+# Menu: 2.Login #
+def login(db_connection):
+    try:
+        username = input(
+            "Enter your username (or type 'exit' to cancel): ").strip()
+        if username.lower() == 'exit':
+            print("Login cancelled.")
+            return None
+
+        password = getpass("Enter your password (or type 'exit' to cancel): ")
+        if password.lower() == 'exit':
+            print("Login cancelled.")
+            return None
+
+        if verify_password(db_connection, username, password):
+            print("Login successful!")
+            return username
+        else:
+            return None
+    except pymysql.Error  as e:
+        print(f"Database error occurred: {e}")
+        return None
+    except Exception as e:
+        print(f"An unexpected error occurred: {e}")
+        return None
+    
+
+# Authenticated Menu: Update User Details #
 def update_user_details(db_connection, username):
+    current_password = getpass("Enter your current password: ")
+    if not verify_password(db_connection, username, current_password):
+        return
     try:
         user_info = get_user_info(db_connection, is_create=False)
         if user_info is None:
@@ -63,7 +96,7 @@ def update_user_details(db_connection, username):
     except Exception as e:
         print(f'An error occurred: {e}')
 
-
+# Helper functions #
 def get_user_info(db_connection, is_create=True):
     try:
         first_name = get_input('Enter first name (or type "exit" to cancel): ')
@@ -82,7 +115,7 @@ def get_user_info(db_connection, is_create=True):
         if phone_number is None:
             return None
 
-        username = None
+        username=None
         if is_create:
             username = get_unique_username(db_connection)
             if username is None:
@@ -109,26 +142,27 @@ def get_user_info(db_connection, is_create=True):
 
         return first_name, last_name, address, phone_number, username, hashed_password
 
+    except pymysql.Error as e:
+        print(f'Database error occurred: {e}')
     except Exception as e:
         print(f'An error occurred: {e}')
-        return None
 
 
 def get_input(prompt, is_phone=False, is_confirm=False):
     while True:
-        user_input = input(prompt)
-        if user_input.lower() == 'exit':
-            print('User creation cancelled.')
-            return None
-        elif not user_input:
-            print('This field cannot be left blank. Please enter a value.')
-            continue
-        elif is_phone and not user_input.isdigit():
-            print('Invalid phone number. Please enter only digits.')
-        elif is_confirm and user_input.lower() not in ['y', 'n']:
-            print('Please enter "y" for yes or "n" for no.')
-        else:
-            return user_input
+            user_input = input(prompt)
+            if user_input.lower() == 'exit':
+                print('User creation cancelled.')
+                return None
+            elif not user_input:
+                print('This field cannot be left blank. Please enter a value.')
+                continue
+            elif is_phone and not user_input.isdigit():
+                print('Invalid phone number. Please enter only digits.')
+            elif is_confirm and user_input.lower() not in ['y', 'n']:
+                print('Please enter "y" for yes or "n" for no.')
+            else:
+                return user_input
 
 
 def get_unique_username(db_connection):
@@ -148,18 +182,19 @@ def get_unique_username(db_connection):
                     return username
         except pymysql.Error as e:
             print(f'Database error occurred: {e}')
-            return None
+        except Exception as e:
+            print(f'An error occurred: {e}')
 
 
 def get_password():
     while True:
         password = getpass('Enter new password (or type "exit" to cancel): ')
-        if password == 'exit':
+        if password.lower() == 'exit':
             print('User creation cancelled.')
             return None
         confirm_password = getpass(
             'Re-enter new password (or type "exit" to cancel): ')
-        if confirm_password == 'exit':
+        if confirm_password.lower() == 'exit':
             print('User creation cancelled.')
             return None
         if password == confirm_password:
@@ -168,39 +203,29 @@ def get_password():
             print('Passwords do not match.')
 
 
-# User Authentication Functions #
-def login(db_connection):
-    username = input(
-        "Enter your username (or type 'exit' to cancel): ").strip()
-    if username.lower() == 'exit':
-        print("Login cancelled.")
-        return None
-
-    password = getpass("Enter your password (or type 'exit' to cancel): ")
-    if password.lower() == 'exit':
-        print("Login cancelled.")
-        return None
-
+def verify_password(db_connection, username, password):
     try:
         with db_connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT password FROM users WHERE username = %s", (username,))
+            cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
             result = cursor.fetchone()
 
-            if result:
-                hashed_password = result['password']
-
-                if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
-                    print("Login successful!")
-                    return username
-                else:
-                    print("Incorrect password.")
-            else:
+            if not result:
                 print("Username not found.")
+                return False
+            hashed_password = result['password']
+            if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
+                return True
+            else:
+                print("Incorrect password.")
+                return False
+      
     except pymysql.Error as e:
         print(f"Database error occurred: {e}")
+        return False
     except Exception as e:
         print(f"An error occurred: {e}")
+        return False
 
-    return None
+
+
 

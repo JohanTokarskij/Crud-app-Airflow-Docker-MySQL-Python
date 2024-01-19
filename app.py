@@ -11,6 +11,9 @@ def main():
         mongodb_connection, posts = establish_mongobd_connection()
         if mysql_connection and mongodb_connection:
             initial_menu(mysql_connection, posts)
+
+    except KeyboardInterrupt:
+        print("\n\nApplication is terminated by user. Exiting application.")
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:
