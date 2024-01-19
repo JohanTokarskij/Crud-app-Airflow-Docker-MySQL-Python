@@ -5,15 +5,22 @@ import base64
 
 
 # MongoDB Database Connection #
-def establish_mongobd_connection():
+def establish_mongodb_connection():
     try:
         client = MongoClient('mongodb://mongoadmin:mongopassword@localhost:27017')
+
+        client.server_info()
+
         db = client['posts_db']
         posts = db['posts']
+
         print('Connection to MongoDB is successful')
         return client, posts
     except ConnectionFailure as e:
         print(f'MongoDB connection failed: {e}')
+        return None
+    except PyMongoError as e:
+        print(f'An error occurred with MongoDB: {e}')
         return None
 
 

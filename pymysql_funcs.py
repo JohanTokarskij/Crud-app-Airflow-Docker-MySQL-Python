@@ -148,26 +148,32 @@ def get_user_info(db_connection, is_create=True):
         print(f'An error occurred: {e}')
 
 
-def get_input(prompt, is_phone=False, is_confirm=False):
+def get_input(prompt, is_phone=False, is_confirm=False, is_username=False):
     while True:
-            user_input = input(prompt)
-            if user_input.lower() == 'exit':
-                print('User creation cancelled.')
-                return None
-            elif not user_input:
-                print('This field cannot be left blank. Please enter a value.')
-                continue
-            elif is_phone and not user_input.isdigit():
-                print('Invalid phone number. Please enter only digits.')
-            elif is_confirm and user_input.lower() not in ['y', 'n']:
-                print('Please enter "y" for yes or "n" for no.')
-            else:
-                return user_input
+        user_input = input(prompt)
+        if user_input.lower() == 'exit':
+            print('User creation cancelled.')
+            return None
+        elif not user_input:
+            print('This field cannot be left blank. Please enter a value.')
+            continue
+        elif is_phone and not user_input.isdigit():
+            print('Invalid phone number. Please enter only digits.')
+            continue
+        elif is_confirm and user_input.lower() not in ['y', 'n']:
+            print('Please enter "y" for yes or "n" for no.')
+            continue
+        elif is_username and not user_input.isalnum():
+            print('Invalid username. Please use only letters and numbers.')
+            continue
+        else:
+            return user_input
+
 
 
 def get_unique_username(db_connection):
     while True:
-        username = get_input('Enter username (or type "exit" to cancel): ')
+        username = get_input('Enter username (or type "exit" to cancel): ', is_username=True)
 
         try:
             with db_connection.cursor() as cursor:

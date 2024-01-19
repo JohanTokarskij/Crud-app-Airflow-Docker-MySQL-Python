@@ -1,5 +1,5 @@
 from pymysql_funcs import establish_mysql_connection
-from pymongo_funcs import establish_mongobd_connection
+from pymongo_funcs import establish_mongodb_connection
 from menus import initial_menu
 
 def main():
@@ -8,7 +8,7 @@ def main():
 
     try:
         mysql_connection = establish_mysql_connection()
-        mongodb_connection, posts = establish_mongobd_connection()
+        mongodb_connection, posts = establish_mongodb_connection()
         if mysql_connection and mongodb_connection:
             initial_menu(mysql_connection, posts)
 

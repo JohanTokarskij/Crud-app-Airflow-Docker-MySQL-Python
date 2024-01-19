@@ -18,10 +18,10 @@ def initial_menu(db_connection, mongodb_connection):
             if username:
                 authenticated_menu(db_connection, mongodb_connection, username)
         elif choice == '3':
-            print("Exiting the application.")
+            print("\nExiting the application.")
             break
         else:
-            print("Invalid choice. Please try again.")
+            print("\nInvalid choice. Please try again.")
 
 def authenticated_menu(db_connection, posts, username):
     print(f'\nWelcome back, {username}!')
