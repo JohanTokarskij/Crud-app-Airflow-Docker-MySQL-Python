@@ -25,7 +25,7 @@ def main():
     except KeyboardInterrupt:
         print("\nApplication is terminated by user. Exiting application.")
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"\nAn error occurred: {e}")
     finally:
         if mysql_connection:
             try:
