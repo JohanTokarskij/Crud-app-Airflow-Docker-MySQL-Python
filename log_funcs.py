@@ -20,7 +20,7 @@ def write_to_excel():
     else:
         workbook = openpyxl.Workbook()
         sheet = workbook.active
-        column_names = ['Username', 'Year', 'Month', 'Day', 'Hour', 'Count']
+        column_names = ['Year', 'Month', 'Day', 'Hour', 'Username', 'Count']
         sheet.append(column_names)
 
         with open(PATH_TO_CSV, 'r', newline='', encoding='utf-8') as file:
@@ -35,8 +35,7 @@ def write_to_excel():
         for (username, hour_slice), count in counts_per_hour.items():
             date_part, hour_part = hour_slice.split(' ')
             year, month, day = date_part.split('-')
-            row = [username, int(year), int(month), int(day), int(hour_part), count]
+            row = [int(year), int(month), int(day), f'{int(hour_part)}:00 - {int(hour_part)}:59', username, count]
             sheet.append(row)
 
         workbook.save(PATH_TO_XLSX)
-
