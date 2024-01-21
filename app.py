@@ -7,7 +7,7 @@ import logging
 logging.basicConfig(
     filename='logs/user_login.csv',
     level=logging.INFO,
-    format='%(message)s, %(asctime)s',
+    format='%(message)s,%(asctime)s',
     datefmt='%Y-%m-%d %H:%M:%S'
 )
 
