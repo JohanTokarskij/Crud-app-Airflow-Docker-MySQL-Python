@@ -1,6 +1,16 @@
 from pymysql_funcs import establish_mysql_connection
 from pymongo_funcs import establish_mongodb_connection
 from menus import initial_menu
+import logging
+
+
+logging.basicConfig(
+    filename='logs/user_login.csv',
+    level=logging.INFO,
+    format='%(message)s, %(asctime)s',
+    datefmt='%Y-%m-%d %H:%M:%S'
+)
+
 
 def main():
     mysql_connection = None
@@ -13,7 +23,7 @@ def main():
             initial_menu(mysql_connection, posts)
 
     except KeyboardInterrupt:
-        print("\n\nApplication is terminated by user. Exiting application.")
+        print("\nApplication is terminated by user. Exiting application.")
     except Exception as e:
         print(f"An error occurred: {e}")
     finally:
@@ -30,6 +40,7 @@ def main():
                 print('MongoDB connection has been terminated.')
             except Exception as e:
                 print(f"Error closing MongoDB connection: {e}")
+
 
 if __name__ == '__main__':
     main()
