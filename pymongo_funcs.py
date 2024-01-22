@@ -36,11 +36,11 @@ def post_message(posts, username):
         file_data = None
         if files:
             file_name = files[0]
-            to_upload = input(f"Found '{file_name}' in Uploads. Upload and remove it? (y/n): ")
+            to_upload = input(f'Found "{file_name}" in Uploads. Upload and remove it? (y/n): ')
             if to_upload == 'y':
                 file_path = os.path.join(upload_folder, file_name)
 
-                with open(file_path, "rb") as file:
+                with open(file_path, 'rb') as file:
                     file_content = file.read()
                     encoded_content = base64.b64encode(file_content).decode('utf-8')
 
@@ -63,13 +63,13 @@ def post_message(posts, username):
 
         print('\nPost created successfully.')
     except FileNotFoundError:
-        print("\nFile not found in the upload directory.")
+        print('\nFile not found in the upload directory.')
     except OSError as e:
-        print(f"\nAn OS error occurred: {e}")
+        print(f'\nAn OS error occurred: {e}')
     except PyMongoError as e:
-        print(f"\nDatabase error occurred: {e}")
+        print(f'\nDatabase error occurred: {e}')
     except Exception as e:
-        print(f"\nAn unexpected error occurred: {e}")
+        print(f'\nAn unexpected error occurred: {e}')
 
 # Authenticated Menu: 2.Search Messages #
 def search_messages(posts):
@@ -99,9 +99,9 @@ def search_messages(posts):
 
             print("---------------------------------------------------")
     except PyMongoError as e:
-        print(f"\nDatabase error occurred: {e}")
+        print(f'\nDatabase error occurred: {e}')
     except Exception as e:
-        print(f"\nAn unexpected error occurred: {e}")
+        print(f'\nAn unexpected error occurred: {e}')
 
 # Authenticated Menu: 3.View Message Statistics #
 def view_message_statistics(posts):
@@ -114,6 +114,6 @@ def view_message_statistics(posts):
 
         print(f'\nUser "{search_query}" has posted {result} times.')
     except PyMongoError as e:
-        print(f"\nDatabase error occurred: {e}")
+        print(f'\nDatabase error occurred: {e}')
     except Exception as e:
-        print(f"\nAn unexpected error occurred: {e}")
+        print(f'\nAn unexpected error occurred: {e}')
