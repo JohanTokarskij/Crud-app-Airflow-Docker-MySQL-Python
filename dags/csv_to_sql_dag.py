@@ -22,15 +22,26 @@ def csv_to_sql():
                     port=3306,
                     database='crud_app') as connection:
                 with connection.cursor() as cursor:
-                    insert_query = """
-                    INSERT INTO logs (username, timestamp) VALUES (%s, %s)"""
+                    for row in csv_data:
+                        # Check if the record already exists
+                        cursor.execute("""
+                            SELECT COUNT(*)
+                            FROM logs
+                            WHERE username = %s AND timestamp = %s
+                        """, (row[0], row[1]))
 
-                    try:
-                        for row in csv_data:
-                            cursor.execute(insert_query, (row[0], row[1]))
-                    except mysql.connector.Error as e:
-                        print(f'Error inserting data: {e}')
-                        connection.rollback()
+                        result = cursor.fetchone()
+                        if result[0] == 0:
+                            try:
+                                insert_query = """
+                                    INSERT INTO logs (username, timestamp) VALUES (%s, %s)
+                                """
+                                cursor.execute(insert_query, (row[0], row[1]))
+                            except mysql.connector.Error as e:
+                                print(f'Error inserting data: {e}')
+                                connection.rollback()
+                        else:
+                            print(f'Duplicate record found: {row[0], row[1]}, skipping insertion.')
 
                     connection.commit()
                     print('Data inserted successfully!')
@@ -50,16 +61,6 @@ def empty_csv():
             print('CSV file does not exist.')
     except Exception as e:
         print(f'Error emptying CSV file: {e}')
-
-def empty_excel():
-    try:
-        if os.path.exists(PATH_TO_XLSX):
-            open(PATH_TO_XLSX, 'w').close() 
-            print('Excel file emptied.')
-        else:
-            print('Excel file does not exist.')
-    except Exception as e:
-        print(f'Error emptying Excel file: {e}')
 
 
 default_args = {
@@ -90,10 +91,5 @@ empty_csv_task = PythonOperator(
     dag=dag
 )
 
-empty_excel_task = PythonOperator(
-    task_id='empty_xlsx',
-    python_callable=empty_excel,
-    dag=dag
-)
 
-csv_to_sql_task >> empty_csv_task >> empty_excel_task
+csv_to_sql_task >> empty_csv_task

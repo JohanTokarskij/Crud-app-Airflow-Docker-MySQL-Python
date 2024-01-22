@@ -4,5 +4,3 @@ logs/*
 !/logs/.gitkeep
 #logs/user_login.csv
 #logs/login_history.xlsx
-dags/file_creation_dag.py
-dags/simple_dag.py
