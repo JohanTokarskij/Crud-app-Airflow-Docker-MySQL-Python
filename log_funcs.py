@@ -42,8 +42,7 @@ def write_to_excel(username):
         try:
             workbook = openpyxl.Workbook()
             sheet = workbook.active
-            column_names = ['Year', 'Month',
-                            'Day', 'Hour', 'Username', 'Count']
+            column_names = ['Year', 'Month', 'Day', 'Hour', 'Username', 'Count']
             sheet.append(column_names)
 
             with open(PATH_TO_CSV, 'r', newline='', encoding='utf-8') as file:
