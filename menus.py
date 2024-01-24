@@ -49,4 +49,5 @@ def authenticated_menu(db_connection, posts, username):
         else:
             print('\nInvalid choice. Please try again.')
 
-
+def clear_menu():
+    pass
