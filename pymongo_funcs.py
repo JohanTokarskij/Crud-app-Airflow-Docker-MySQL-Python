@@ -3,6 +3,8 @@ from pymongo.errors import ConnectionFailure, PyMongoError
 import os
 import base64
 
+UPLOAD_FOLDER = os.path.join('.','Uploads')
+DOWNLOAD_FOLDER = os.path.join('.', 'Downloads')
 
 # MongoDB Database Connection #
 def establish_mongodb_connection():
@@ -30,27 +32,36 @@ def post_message(posts, username):
         title = input('Enter the title of your post: ')
         message = input('Enter your message: ')
 
-        upload_folder = './Uploads'
-        files = os.listdir(upload_folder)
+        if not os.path.exists(UPLOAD_FOLDER):
+            os.makedirs(UPLOAD_FOLDER)
+
+        files = os.listdir(UPLOAD_FOLDER)
 
         file_data = None
         if files:
             file_name = files[0]
-            to_upload = input(f'Found "{file_name}" in Uploads. Upload and remove it? (y/n): ')
-            if to_upload == 'y':
-                file_path = os.path.join(upload_folder, file_name)
+            while True:
+                to_upload = input(f'Found "{file_name}" in Uploads. Upload and remove it? (y/n): ')
+                if to_upload.lower() == 'y':
+                    file_path = os.path.join(UPLOAD_FOLDER, file_name)
 
-                with open(file_path, 'rb') as file:
-                    file_content = file.read()
-                    encoded_content = base64.b64encode(file_content).decode('utf-8')
+                    with open(file_path, 'rb') as file:
+                        file_content = file.read()
+                        encoded_content = base64.b64encode(file_content).decode('utf-8')
 
-                file_data = {
-                    'base64': encoded_content,
-                    'name': os.path.splitext(file_name)[0],
-                    'extension': os.path.splitext(file_name)[1]
-                }
+                    file_data = {
+                        'base64': encoded_content,
+                        'name': os.path.splitext(file_name)[0],
+                        'extension': os.path.splitext(file_name)[1]
+                    }
 
-                os.remove(file_path)
+                    os.remove(file_path)
+                    break
+                if to_upload.lower() == 'n':
+                    break
+                else:
+                    print('Please choose "y" and "n"!')
+                
 
         post_document = {
             'username': username,
@@ -87,16 +98,38 @@ def search_messages(posts):
             print(f'No results were found for "{search_query}".')
             return
 
+        ask_for_download = False
         for post in results:
             print(f'Username: {post["username"]}')
             print(f'Title: {post["title"]}')
             print(f'Message: {post["message"]}')
 
             if 'file' in post and post["file"] is not None:
-                print(f'File Name: {post["file"].get("name", "N/A")}{post["file"].get("extension", "N/A")}')
+                ask_for_download = True
+                print(f'File Name: {post["file"].get("name", "N/A")}{post["file"].get("extension", "N/A")}\n')
             else:
-                print('File: None')
-
+                print('File: None\n')
+        
+        if ask_for_download:
+            to_download = input('Files found in post. Download them (y/n)?: ')
+            if to_download == 'y':
+                if not os.path.exists(DOWNLOAD_FOLDER):
+                    os.makedirs(DOWNLOAD_FOLDER)
+                for post in results:
+                    if 'file' in post and post["file"] is not None:
+                        file_info = post['file']
+                        file_name = file_info.get("name", "N/A")
+                        file_extension = file_info.get("extension", "N/A")
+                        file_path = os.path.join(DOWNLOAD_FOLDER, f'{file_name}{file_extension}')
+                        
+                        print(f"Downloading file: {file_path}")
+                        
+                        if 'base64' in file_info:
+                            file_data = base64.b64decode(file_info['base64'])
+                            with open(file_path, 'wb') as file:
+                                file.write(file_data)
+                        else:
+                            print(f"Error downloading {file_name}{file_extension}")
             print("---------------------------------------------------")
     except PyMongoError as e:
         print(f'\nDatabase error occurred: {e}')
@@ -117,3 +150,6 @@ def view_message_statistics(posts):
         print(f'\nDatabase error occurred: {e}')
     except Exception as e:
         print(f'\nAn unexpected error occurred: {e}')
+
+    
+
