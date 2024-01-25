@@ -44,7 +44,7 @@ def post_message(posts, username):
         
         message = input('Enter your message or leave blank to cancel: ' + '\n> ')
         if message == '' :
-            print('\Action cancelled.')
+            print('\nAction cancelled.')
             sleep(0.75)
             return None
         
@@ -163,7 +163,7 @@ def search_messages(posts):
                                 file.write(file_data)
                         else:
                             print(f"Error downloading {file_name}{file_extension}")
-            wait_for_keypress()
+        wait_for_keypress()
     except PyMongoError as e:
         print(f'\nDatabase error occurred: {e}')
         wait_for_keypress()
