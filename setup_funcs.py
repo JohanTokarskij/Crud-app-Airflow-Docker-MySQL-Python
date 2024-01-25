@@ -44,12 +44,19 @@ def initiate_databases_and_tables():
     except pymysql.Error as e:
         print(f'An error has occured: {e}')
 
+
+### HELPER FUNCTIONS ###
 def clear_screen():
     if os.name == 'nt':
         os.system('cls')
     else:
         os.system('clear')
 
+def wait_for_keypress():
+    while True:
+        input("\nPress any key to continue...")
+        break
+########################
 
 if __name__ == '__main__':
     initiate_databases_and_tables()

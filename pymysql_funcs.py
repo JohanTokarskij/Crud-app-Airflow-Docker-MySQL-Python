@@ -1,9 +1,9 @@
 import pymysql
 import bcrypt
 from getpass import getpass
-from log_funcs import log_user_login
-from setup_funcs import clear_screen
 from time import sleep
+from log_funcs import log_user_login
+from setup_funcs import clear_screen, wait_for_keypress
 
 
 # MySQL Database Connection #
@@ -22,6 +22,7 @@ def establish_mysql_connection():
         return connection
     except pymysql.Error as e:
         print(f'\nError connecting to MySQL: {e}')
+        wait_for_keypress()
         return None
 
 
@@ -29,9 +30,9 @@ def establish_mysql_connection():
 def create_user(db_connection):
     try:
         clear_screen()
-        print('\n' + '*' * 30)
-        print('Menu: 1.CREATE USER'.center(30))
-        print('*' * 30)
+        print('\n' + '*' * 40)
+        print('Menu: 1.CREATE USER'.center(40))
+        print('*' * 40)
         user_info = get_user_info(db_connection)
         if user_info is None:
             return
@@ -50,25 +51,27 @@ def create_user(db_connection):
 
     except pymysql.Error as e:
         print(f'\nDatabase error occurred: {e}')
+        wait_for_keypress()
     except Exception as e:
         print(f'\nAn error occurred: {e}')
+        wait_for_keypress()
 
 
 # Menu: 2.Login #
 def login(db_connection):
     try:
-        clear_screen()
-        print('\n' + '*' * 30)
-        print('Menu: 2.LOGIN'.center(30))
-        print('*' * 30)
+        """ clear_screen()
+        print('\n' + '*' * 40)
+        print('Menu: 2.LOGIN'.center(40))
+        print('*' * 40) """
         username = input(
-            'Enter your username (or type "exit" to cancel): ' + '\n> ').strip()
+            'Enter your username (type "exit" to cancel): ' + '\n> ').strip()
         if username.lower() == 'exit':
             print('\nLogin cancelled.')
             sleep(0.75)
             return None
 
-        password = getpass('Enter your password (or type "exit" to cancel): ' + '\n> ')
+        password = getpass('Enter your password (type "exit" to cancel): ' + '\n> ')
         if password.lower() == 'exit':
             print('\nLogin cancelled.')
             sleep(0.75)
@@ -83,9 +86,11 @@ def login(db_connection):
             return None
     except pymysql.Error  as e:
         print(f'\nDatabase error occurred: {e}')
+        wait_for_keypress()
         return None
     except Exception as e:
         print(f'\nAn unexpected error occurred: {e}')
+        wait_for_keypress()
         return None
     
 
@@ -110,25 +115,27 @@ def update_user_details(db_connection, username):
 
     except pymysql.Error as e:
         print(f'\nDatabase error occurred: {e}')
+        wait_for_keypress()
     except Exception as e:
         print(f'\nAn error occurred: {e}')
+        wait_for_keypress()
 
 # Helper functions #
 def get_user_info(db_connection, is_create=True):
     try:
-        first_name = get_input('Enter first name (or type "exit" to cancel): ')
+        first_name = get_input('Enter first name (type "exit" to cancel): ')
         if first_name is None:
             return None
 
-        last_name = get_input('Enter last name (or type "exit" to cancel): ')
+        last_name = get_input('Enter last name (type "exit" to cancel): ')
         if last_name is None:
             return None
 
-        address = get_input('Enter your address (or type "exit" to cancel): ')
+        address = get_input('Enter your address (type "exit" to cancel): ')
         if address is None:
             return None
 
-        phone_number = get_input('Enter phone number (or type "exit" to cancel): ', is_phone=True)
+        phone_number = get_input('Enter phone number (type "exit" to cancel): ', is_phone=True)
         if phone_number is None:
             return None
 
@@ -162,8 +169,10 @@ def get_user_info(db_connection, is_create=True):
 
     except pymysql.Error as e:
         print(f'\nDatabase error occurred: {e}')
+        wait_for_keypress()
     except Exception as e:
         print(f'\nAn error occurred: {e}')
+        wait_for_keypress()
 
 
 def get_input(prompt, is_phone=False, is_confirm=False, is_username=False):
@@ -192,7 +201,7 @@ def get_input(prompt, is_phone=False, is_confirm=False, is_username=False):
 
 def get_unique_username(db_connection):
     while True:
-        username = get_input('Enter username (or type "exit" to cancel): ', is_username=True)
+        username = get_input('Enter username (type "exit" to cancel): ', is_username=True)
 
         try:
             with db_connection.cursor() as cursor:
@@ -206,19 +215,21 @@ def get_unique_username(db_connection):
                     return username
         except pymysql.Error as e:
             print(f'\nDatabase error occurred: {e}')
+            wait_for_keypress()
         except Exception as e:
             print(f'\nAn error occurred: {e}')
+            wait_for_keypress()
 
 
 def get_password():
     while True:
-        password = getpass('Enter new password (or type "exit" to cancel): '+ '\n> ')
+        password = getpass('Enter new password (type "exit" to cancel): '+ '\n> ')
         if password.lower() == 'exit':
             print('\nUser creation cancelled.')
             sleep(0.75)
             return None
         confirm_password = getpass(
-            'Re-enter new password (or type "exit" to cancel): '+ '\n> ')
+            'Re-enter new password (type "exit" to cancel): '+ '\n> ')
         if confirm_password.lower() == 'exit':
             print('\nUser creation cancelled.')
             sleep(0.75)
@@ -249,9 +260,11 @@ def verify_password(db_connection, username, password):
       
     except pymysql.Error as e:
         print(f'\nDatabase error occurred: {e}')
+        wait_for_keypress()
         return False
     except Exception as e:
         print(f'\nAn error occurred: {e}')
+        wait_for_keypress()
         return False
 
 

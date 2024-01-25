@@ -3,6 +3,7 @@ from pymongo.errors import ConnectionFailure, PyMongoError
 import os
 import base64
 from time import sleep
+from setup_funcs import clear_screen, wait_for_keypress
 
 UPLOAD_FOLDER = os.path.join('.','Uploads')
 DOWNLOAD_FOLDER = os.path.join('.', 'Downloads')
@@ -31,8 +32,22 @@ def establish_mongodb_connection():
 # Authenticated Menu: 1.Post a Message #
 def post_message(posts, username):
     try:
-        title = input('Enter the title of your post: ')
-        message = input('Enter your message: ')
+        """ clear_screen()
+        print('\n' + '*' * 40)
+        print('Authenticated Menu: 1.Post a Message'.center(40))
+        print('*' * 40) """
+        title = input('Enter the title of your post or leave blank to cancel: ' + '\n> ')
+        if title == '' :
+            print('\nAction cancelled.')
+            sleep(0.75)
+            return None
+        
+        message = input('Enter your message or leave blank to cancel: ' + '\n> ')
+        if message == '' :
+            print('\Action cancelled.')
+            sleep(0.75)
+            return None
+        
 
         if not os.path.exists(UPLOAD_FOLDER):
             os.makedirs(UPLOAD_FOLDER)
@@ -43,7 +58,7 @@ def post_message(posts, username):
         if files:
             file_name = files[0]
             while True:
-                to_upload = input(f'Found "{file_name}" in Uploads. Upload and remove it? (y/n): ')
+                to_upload = input(f'Found "{file_name}" in Uploads. Upload and remove it? (y/n): ' + '\n> ')
                 if to_upload.lower() == 'y':
                     file_path = os.path.join(UPLOAD_FOLDER, file_name)
 
@@ -62,7 +77,7 @@ def post_message(posts, username):
                 if to_upload.lower() == 'n':
                     break
                 else:
-                    print('Please choose "y" and "n"!')
+                    print('Please choose "y" and "n"!\n')
                 
 
         post_document = {
@@ -75,19 +90,33 @@ def post_message(posts, username):
         posts.insert_one(post_document)
 
         print('\nPost created successfully.')
+        sleep(0.75)
     except FileNotFoundError:
         print('\nFile not found in the upload directory.')
+        wait_for_keypress()
     except OSError as e:
         print(f'\nAn OS error occurred: {e}')
+        wait_for_keypress()
     except PyMongoError as e:
         print(f'\nDatabase error occurred: {e}')
+        wait_for_keypress()
     except Exception as e:
         print(f'\nAn unexpected error occurred: {e}')
+        wait_for_keypress()
 
 # Authenticated Menu: 2.Search Messages #
 def search_messages(posts):
     try:
-        search_query = input('Enter a keyword in the title: ')
+        """ clear_screen()
+        print('\n' + '*' * 40)
+        print('Authenticated Menu: 2.Search Messages'.center(40))
+        print('*' * 40) """
+        search_query = input('\nEnter a keyword in the title or leave blank to cancel: ' + '\n> ')
+
+        if search_query == '':
+            print('\nAction cancelled.')
+            sleep(0.75)
+            return None
 
         cursor = posts.find({
             'title': {'$regex': search_query, '$options': 'i'}
@@ -98,6 +127,7 @@ def search_messages(posts):
         results = list(cursor)
         if len(results) == 0:
             print(f'No results were found for "{search_query}".')
+            wait_for_keypress()
             return
 
         ask_for_download = False
@@ -111,10 +141,11 @@ def search_messages(posts):
                 print(f'File Name: {post["file"].get("name", "N/A")}{post["file"].get("extension", "N/A")}\n')
             else:
                 print('File: None\n')
+            print("---------------------------------------------------")
         
         if ask_for_download:
-            to_download = input('Files found in post. Download them (y/n)?: ')
-            if to_download == 'y':
+            to_download = input('Files found in post. Download them (y/n)?: ' + '\n> ')
+            if to_download.lower() == 'y':
                 if not os.path.exists(DOWNLOAD_FOLDER):
                     os.makedirs(DOWNLOAD_FOLDER)
                 for post in results:
@@ -132,26 +163,40 @@ def search_messages(posts):
                                 file.write(file_data)
                         else:
                             print(f"Error downloading {file_name}{file_extension}")
-            print("---------------------------------------------------")
+            wait_for_keypress()
     except PyMongoError as e:
         print(f'\nDatabase error occurred: {e}')
+        wait_for_keypress()
     except Exception as e:
         print(f'\nAn unexpected error occurred: {e}')
+        wait_for_keypress()
 
 # Authenticated Menu: 3.View Message Statistics #
 def view_message_statistics(posts):
     try:
-        search_query = input('Enter username to view post count: ')
+        """ clear_screen()
+        print('\n' + '*' * 40)
+        print('Authenticated Menu: 3.View Message Statistics'.center(40))
+        print('*' * 40) """
+        search_query = input('\nEnter username to view post count or leave blank to cancel: ' + '\n> ')
+
+        if search_query == '':
+            print('\nAction cancelled.')
+            sleep(0.75)
+            return None
 
         result = posts.count_documents({
             'username': search_query
         })
 
         print(f'\nUser "{search_query}" has posted {result} times.')
+        wait_for_keypress()
     except PyMongoError as e:
         print(f'\nDatabase error occurred: {e}')
+        wait_for_keypress()
     except Exception as e:
         print(f'\nAn unexpected error occurred: {e}')
+        wait_for_keypress()
 
     
 
