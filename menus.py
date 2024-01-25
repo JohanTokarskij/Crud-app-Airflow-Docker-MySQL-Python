@@ -40,12 +40,16 @@ def authenticated_menu(db_connection, posts, username):
         print('\n' + '*' * 40)
         print('AUTHENTICATED MENU'.center(40))
         print('*' * 40)
+
         print(f'\nWelcome back, {username}!')
+
         print('\n1. Post a Message')
         print('2. Search Messages')
         print('3. View Message Statistics')
         print('4. Update User Details')
         print('5. Logout')
+
+        print('\n' + '*' * 40 + '\n')
 
         choice = input('Enter your choice (1-5): ')
 
