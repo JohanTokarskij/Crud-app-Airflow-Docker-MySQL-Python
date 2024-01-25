@@ -47,14 +47,11 @@ def initiate_databases_and_tables():
 
 ### HELPER FUNCTIONS ###
 def clear_screen():
-    if os.name == 'nt':
-        os.system('cls')
-    else:
-        os.system('clear')
+        os.system('cls' if os.name == 'nt' else 'clear')
 
 def wait_for_keypress():
     while True:
-        input("\nPress any key to continue...")
+        input('\nPress "Enter" to continue...')
         break
 ########################
 
