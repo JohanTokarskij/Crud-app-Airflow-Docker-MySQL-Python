@@ -18,7 +18,6 @@ def main():
     mongodb_connection = None
 
     try:
-        clear_screen()
         mysql_connection = establish_mysql_connection()
         mongodb_connection, posts = establish_mongodb_connection()
         if mysql_connection and mongodb_connection:
