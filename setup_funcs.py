@@ -1,4 +1,5 @@
 import pymysql
+import os
 
 
 def initiate_databases_and_tables():
@@ -42,6 +43,12 @@ def initiate_databases_and_tables():
         print('Database "crud_app" with table "users" is set up and ready.')
     except pymysql.Error as e:
         print(f'An error has occured: {e}')
+
+def clear_screen():
+    if os.name == 'nt':
+        os.system('cls')
+    else:
+        os.system('clear')
 
 
 if __name__ == '__main__':

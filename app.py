@@ -1,6 +1,7 @@
 from pymysql_funcs import establish_mysql_connection
 from pymongo_funcs import establish_mongodb_connection
 from menus import initial_menu
+from setup_funcs import clear_screen
 import logging
 
 
@@ -17,6 +18,7 @@ def main():
     mongodb_connection = None
 
     try:
+        clear_screen()
         mysql_connection = establish_mysql_connection()
         mongodb_connection, posts = establish_mongodb_connection()
         if mysql_connection and mongodb_connection:

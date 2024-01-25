@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, PyMongoError
 import os
 import base64
+from time import sleep
 
 UPLOAD_FOLDER = os.path.join('.','Uploads')
 DOWNLOAD_FOLDER = os.path.join('.', 'Downloads')
@@ -16,7 +17,8 @@ def establish_mongodb_connection():
         db = client['posts_db']
         posts = db['posts']
 
-        print('\nConnection to MongoDB is successful')
+        print('Connection to MongoDB is successful')
+        sleep(0.5)
         return client, posts
     except ConnectionFailure as e:
         print(f'\nMongoDB connection failed: {e}')

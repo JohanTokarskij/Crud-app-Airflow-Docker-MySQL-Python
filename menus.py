@@ -1,13 +1,21 @@
 from pymysql_funcs import create_user, login, update_user_details
 from pymongo_funcs import post_message, search_messages, view_message_statistics
+from setup_funcs import clear_screen
+from time import sleep
 
 
 def initial_menu(db_connection, mongodb_connection):
     while True:
-        print('\nMenu:')
-        print('1. Create User')
+        clear_screen()
+        print('\n' + '*' * 30)
+        print('MAIN MENU'.center(30))
+        print('*' * 30)
+        
+        print('\n1. Create User')
         print('2. Login')
         print('3. Exit')
+        
+        print('\n' + '*' * 30 + '\n')
 
         choice = input('Enter your choice (1-3): ')
 
@@ -22,12 +30,16 @@ def initial_menu(db_connection, mongodb_connection):
             break
         else:
             print('\nInvalid choice. Please try again.')
+            sleep(0.5)
 
 def authenticated_menu(db_connection, posts, username):
-    print(f'\nWelcome back, {username}!')
+    clear_screen()
     while True:
-        print('\nAuthenticated Menu:')
-        print('1. Post a Message')
+        print('\n' + '*' * 30)
+        print('AUTHENTICATED MENU:'.center(30))
+        print('*' * 30)
+        print(f'\nWelcome back, {username}!')
+        print('\n1. Post a Message')
         print('2. Search Messages')
         print('3. View Message Statistics')
         print('4. Update User Details')
@@ -49,5 +61,3 @@ def authenticated_menu(db_connection, posts, username):
         else:
             print('\nInvalid choice. Please try again.')
 
-def clear_menu():
-    pass
