@@ -1,9 +1,9 @@
 import pymysql
-import os
+import subprocess
 
 
 def initiate_databases_and_tables():
-    try:
+    try:    
         with pymysql.connect(user='root',
                              password='password',
                              host='localhost',
@@ -23,10 +23,10 @@ def initiate_databases_and_tables():
                     first_name VARCHAR(100),
                     last_name VARCHAR(100),
                     username VARCHAR(100) UNIQUE,
-                    password VARCHAR(100),
+                    password VARCHAR(1000),
                     address VARCHAR(255),
                     phone_number VARCHAR(20)
-                )
+                );
                 """
                 cursor.execute(create_users_table_query)
                 
@@ -44,16 +44,6 @@ def initiate_databases_and_tables():
     except pymysql.Error as e:
         print(f'An error has occured: {e}')
 
-
-### HELPER FUNCTIONS ###
-def clear_screen():
-        os.system('cls' if os.name == 'nt' else 'clear')
-
-def wait_for_keypress():
-    while True:
-        input('\nPress "Enter" to continue...')
-        break
-########################
 
 if __name__ == '__main__':
     initiate_databases_and_tables()

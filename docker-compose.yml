@@ -25,7 +25,7 @@ services:
     image: apache/airflow:latest
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=mysql+mysqlconnector://root:password@mysql:3306/airflow
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=mysql+mysqlconnector://root:password@mysql:3306/airflow
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
       - AIRFLOW__WEBSERVER__SECRET_KEY=super_secret_key
       - _AIRFLOW_WWW_USER_USERNAME=admin
@@ -35,24 +35,22 @@ services:
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
-      - ./plugins:/opt/airflow/plugins
     depends_on:
       - mysql
-    command: bash -c "airflow db upgrade && airflow users create --username admin --password password --firstname Admin --lastname User --role Admin --email admin@example.com && airflow webserver"
+    command: airflow webserver
 
   airflow-scheduler:
     image: apache/airflow:latest
     environment:
       - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__CORE__SQL_ALCHEMY_CONN=mysql+mysqlconnector://root:password@mysql:3306/airflow
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=mysql+mysqlconnector://root:password@mysql:3306/airflow
       - AIRFLOW__CORE__LOAD_EXAMPLES=False
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
-      - ./plugins:/opt/airflow/plugins
     depends_on:
       - mysql
-    command: bash -c "airflow db upgrade && airflow scheduler"
+    command: airflow scheduler
 
 volumes:
   mysql_data:

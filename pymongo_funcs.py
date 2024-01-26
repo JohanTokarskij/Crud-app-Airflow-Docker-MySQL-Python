@@ -3,7 +3,7 @@ from pymongo.errors import ConnectionFailure, PyMongoError
 import os
 import base64
 from time import sleep
-from setup_funcs import clear_screen, wait_for_keypress
+from helper_funcs import wait_for_keypress
 
 UPLOAD_FOLDER = os.path.join('.','Uploads')
 DOWNLOAD_FOLDER = os.path.join('.', 'Downloads')
@@ -32,10 +32,6 @@ def establish_mongodb_connection():
 # Authenticated Menu: 1.Post a Message #
 def post_message(posts, username):
     try:
-        """ clear_screen()
-        print('\n' + '*' * 40)
-        print('Authenticated Menu: 1.Post a Message'.center(40))
-        print('*' * 40) """
         title = input('Enter the title of your post or leave blank to cancel: ' + '\n> ')
         if title == '' :
             print('\nAction cancelled.')
@@ -107,10 +103,6 @@ def post_message(posts, username):
 # Authenticated Menu: 2.Search Messages #
 def search_messages(posts):
     try:
-        """ clear_screen()
-        print('\n' + '*' * 40)
-        print('Authenticated Menu: 2.Search Messages'.center(40))
-        print('*' * 40) """
         search_query = input('\nEnter a keyword in the title or leave blank to cancel: ' + '\n> ')
 
         if search_query == '':
@@ -174,10 +166,6 @@ def search_messages(posts):
 # Authenticated Menu: 3.View Message Statistics #
 def view_message_statistics(posts):
     try:
-        """ clear_screen()
-        print('\n' + '*' * 40)
-        print('Authenticated Menu: 3.View Message Statistics'.center(40))
-        print('*' * 40) """
         search_query = input('\nEnter username to view post count or leave blank to cancel: ' + '\n> ')
 
         if search_query == '':

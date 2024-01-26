@@ -3,7 +3,7 @@ import bcrypt
 from getpass import getpass
 from time import sleep
 from log_funcs import log_user_login
-from setup_funcs import clear_screen, wait_for_keypress
+from helper_funcs import clear_screen, wait_for_keypress
 
 
 # MySQL Database Connection #

@@ -1,6 +1,6 @@
 from pymysql_funcs import create_user, login, update_user_details
 from pymongo_funcs import post_message, search_messages, view_message_statistics
-from setup_funcs import clear_screen,wait_for_keypress
+from helper_funcs import clear_screen
 from time import sleep
 
 
