@@ -1,9 +1,9 @@
 import pymysql
 import bcrypt
 from getpass import getpass
-from time import sleep
 from log_funcs import log_user_login
 from helper_funcs import clear_screen, wait_for_keypress
+from time import sleep
 
 
 # MySQL Database Connection #
@@ -29,7 +29,6 @@ def establish_mysql_connection():
 # Menu: 1.Create User #
 def create_user(db_connection):
     try:
-        clear_screen()
         print('\n' + '*' * 40)
         print('Menu: 1.CREATE USER'.center(40))
         print('*' * 40)
@@ -47,7 +46,7 @@ def create_user(db_connection):
                            username, hashed_password, address, phone_number))
             db_connection.commit()
             print('\nUser created successfully.')
-            sleep(0.75)
+            clear_screen()
 
     except pymysql.Error as e:
         print(f'\nDatabase error occurred: {e}')
@@ -60,27 +59,23 @@ def create_user(db_connection):
 # Menu: 2.Login #
 def login(db_connection):
     try:
-        """ clear_screen()
-        print('\n' + '*' * 40)
-        print('Menu: 2.LOGIN'.center(40))
-        print('*' * 40) """
         username = input(
             'Enter your username (type "exit" to cancel): ' + '\n> ').strip()
         if username.lower() == 'exit':
             print('\nLogin cancelled.')
-            sleep(0.75)
+            clear_screen()
             return None
 
         password = getpass('Enter your password (type "exit" to cancel): ' + '\n> ')
         if password.lower() == 'exit':
             print('\nLogin cancelled.')
-            sleep(0.75)
+            clear_screen()
             return None
 
         if verify_password(db_connection, username, password):
-            print('\nLogin successful!')
-            sleep(0.75)
             log_user_login(username)
+            print('\nLogin successful!')
+            clear_screen()
             return username
         else:
             return None
@@ -112,6 +107,7 @@ def update_user_details(db_connection, username):
             cursor.execute(update_query, (first_name, last_name, hashed_password, address, phone_number, username))
             db_connection.commit()
             print('\nUser details updated successfully.')
+            clear_screen()
 
     except pymysql.Error as e:
         print(f'\nDatabase error occurred: {e}')
@@ -162,7 +158,7 @@ def get_user_info(db_connection, is_create=True):
         confirm = get_input(f'\nProceed with {action} a user? (y/n): ', is_confirm=True)
         if confirm is None or confirm.lower() != 'y':
             print(f'\nUser {action} canceled.')
-            sleep(0.75)
+            clear_screen()
             return None
 
         return first_name, last_name, address, phone_number, username, hashed_password
@@ -180,7 +176,7 @@ def get_input(prompt, is_phone=False, is_confirm=False, is_username=False):
         user_input = input(prompt + '\n> ')
         if user_input.lower() == 'exit':
             print('\nUser creation cancelled.')
-            sleep(0.75)
+            clear_screen()
             return None
         elif not user_input:
             print('This field cannot be left blank. Please enter a value.\n')
@@ -226,13 +222,13 @@ def get_password():
         password = getpass('Enter new password (type "exit" to cancel): '+ '\n> ')
         if password.lower() == 'exit':
             print('\nUser creation cancelled.')
-            sleep(0.75)
+            clear_screen()
             return None
         confirm_password = getpass(
             'Re-enter new password (type "exit" to cancel): '+ '\n> ')
         if confirm_password.lower() == 'exit':
             print('\nUser creation cancelled.')
-            sleep(0.75)
+            clear_screen()
             return None
         if password == confirm_password:
             return password
@@ -248,14 +244,13 @@ def verify_password(db_connection, username, password):
 
             if not result:
                 print('\nUsername not found.')
-                sleep(0.75)
                 return False
             hashed_password = result['password']
             if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
                 return True
             else:
                 print('\nIncorrect password.')
-                sleep(0.75)
+                clear_screen()
                 return False
       
     except pymysql.Error as e:

@@ -6,7 +6,6 @@ from time import sleep
 
 def initial_menu(db_connection, mongodb_connection):
     while True:
-        clear_screen()
         print('\n' + '*' * 40)
         print('MAIN MENU'.center(40))
         print('*' * 40)
@@ -28,15 +27,13 @@ def initial_menu(db_connection, mongodb_connection):
         elif choice == '3':
             print('\nExiting the application.')
             sleep(0.75)
-            clear_screen()
             break
         else:
             print('\nInvalid choice. Please try again.')
-            sleep(0.5)
+            clear_screen()
 
 def authenticated_menu(db_connection, posts, username):
     while True:
-        clear_screen()
         print('\n' + '*' * 40)
         print('AUTHENTICATED MENU'.center(40))
         print('*' * 40)
@@ -63,8 +60,9 @@ def authenticated_menu(db_connection, posts, username):
             update_user_details(db_connection, username)
         elif choice == '5':
             print('\nLogging out.')
-            sleep(0.75)
+            clear_screen()
             break
         else:
             print('\nInvalid choice. Please try again.')
+            clear_screen()
 

@@ -2,8 +2,8 @@ from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure, PyMongoError
 import os
 import base64
+from helper_funcs import wait_for_keypress, clear_screen
 from time import sleep
-from helper_funcs import wait_for_keypress
 
 UPLOAD_FOLDER = os.path.join('.','Uploads')
 DOWNLOAD_FOLDER = os.path.join('.', 'Downloads')
@@ -35,13 +35,13 @@ def post_message(posts, username):
         title = input('Enter the title of your post or leave blank to cancel: ' + '\n> ')
         if title == '' :
             print('\nAction cancelled.')
-            sleep(0.75)
+            clear_screen()
             return None
         
         message = input('Enter your message or leave blank to cancel: ' + '\n> ')
         if message == '' :
             print('\nAction cancelled.')
-            sleep(0.75)
+            clear_screen()
             return None
         
 
@@ -86,7 +86,7 @@ def post_message(posts, username):
         posts.insert_one(post_document)
 
         print('\nPost created successfully.')
-        sleep(0.75)
+        clear_screen()
     except FileNotFoundError:
         print('\nFile not found in the upload directory.')
         wait_for_keypress()
@@ -107,7 +107,7 @@ def search_messages(posts):
 
         if search_query == '':
             print('\nAction cancelled.')
-            sleep(0.75)
+            clear_screen()
             return None
 
         cursor = posts.find({
@@ -170,7 +170,7 @@ def view_message_statistics(posts):
 
         if search_query == '':
             print('\nAction cancelled.')
-            sleep(0.75)
+            clear_screen()
             return None
 
         result = posts.count_documents({
