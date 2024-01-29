@@ -29,9 +29,6 @@ def establish_mysql_connection():
 # Menu: 1.Create User #
 def create_user(db_connection):
     try:
-        print('\n' + '*' * 40)
-        print('Menu: 1.CREATE USER'.center(40))
-        print('*' * 40)
         user_info = get_user_info(db_connection)
         if user_info is None:
             return
@@ -109,6 +106,35 @@ def update_user_details(db_connection, username):
             print('\nUser details updated successfully.')
             clear_screen()
 
+    except pymysql.Error as e:
+        print(f'\nDatabase error occurred: {e}')
+        wait_for_keypress()
+    except Exception as e:
+        print(f'\nAn error occurred: {e}')
+        wait_for_keypress()
+
+# Authenticated Menu: Delete Account #
+def delete_account(db_connection, username):
+    current_password = getpass('Enter your current password: ')
+    if not verify_password(db_connection, username, current_password):
+        return
+    try:
+        user_choice = input('Are you sure you want to delete your user account (y/n)?')
+        if user_choice == 'n':
+            print('\nAction cancelled.')
+            clear_screen()
+            return
+        
+        with db_connection.cursor() as cursor:
+            delete_query = """
+                            DELETE FROM users
+                            WHERE username = %s
+                            """
+            cursor.execute(delete_query, (username,))
+            db_connection.commit()
+        
+        print('The account has been deleted.')
+        clear_screen()
     except pymysql.Error as e:
         print(f'\nDatabase error occurred: {e}')
         wait_for_keypress()
@@ -244,6 +270,7 @@ def verify_password(db_connection, username, password):
 
             if not result:
                 print('\nUsername not found.')
+                clear_screen()
                 return False
             hashed_password = result['password']
             if bcrypt.checkpw(password.encode('utf-8'), hashed_password.encode('utf-8')):
