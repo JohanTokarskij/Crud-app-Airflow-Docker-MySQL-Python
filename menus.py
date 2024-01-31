@@ -1,4 +1,4 @@
-from pymysql_funcs import create_user, login, update_user_details
+from pymysql_funcs import create_user, login, update_user_details, delete_account
 from pymongo_funcs import post_message, search_messages, view_message_statistics
 from helper_funcs import clear_screen
 from time import sleep
@@ -44,11 +44,12 @@ def authenticated_menu(db_connection, posts, username):
         print('2. Search Messages')
         print('3. View Message Statistics')
         print('4. Update User Details')
-        print('5. Logout')
+        print('5. Delete account')
+        print('6. Logout')
 
         print('\n' + '*' * 40 + '\n')
 
-        choice = input('Enter your choice (1-5): ')
+        choice = input('Enter your choice (1-6): ')
 
         if choice == '1':
             post_message(posts, username)
@@ -59,6 +60,9 @@ def authenticated_menu(db_connection, posts, username):
         elif choice == '4':
             update_user_details(db_connection, username)
         elif choice == '5':
+            delete_account(db_connection, username)
+            break
+        elif choice == '6':
             print('\nLogging out.')
             clear_screen()
             break
