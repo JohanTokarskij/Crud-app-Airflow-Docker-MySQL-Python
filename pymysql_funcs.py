@@ -119,19 +119,19 @@ def update_user_details(db_connection, username):
 # Helper functions #
 def get_user_info(db_connection, is_create=True):
     try:
-        first_name = get_input('Enter first name (type "exit" to cancel): ')
+        first_name = get_input('first name ')
         if first_name is None:
             return None
 
-        last_name = get_input('Enter last name (type "exit" to cancel): ')
+        last_name = get_input('last name')
         if last_name is None:
             return None
 
-        address = get_input('Enter your address (type "exit" to cancel): ')
+        address = get_input('address')
         if address is None:
             return None
 
-        phone_number = get_input('Enter phone number (type "exit" to cancel): ', is_phone=True)
+        phone_number = get_input('phone number', is_phone=True)
         if phone_number is None:
             return None
 
@@ -147,7 +147,7 @@ def get_user_info(db_connection, is_create=True):
 
         hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
-        action = 'creating' if is_create else 'updating'
+        action = 'create' if is_create else 'update'
         print(f"""\nSummary:
               First name: {first_name}
               Last name: {last_name}
@@ -155,10 +155,8 @@ def get_user_info(db_connection, is_create=True):
               Phone number: {phone_number}
               Username: {username if username else '[Not Changed]'}""")
 
-        confirm = get_input(f'\nProceed with {action} a user? (y/n): ', is_confirm=True)
+        confirm = get_input(f'"y" to {action} an account. ', is_confirm=True)
         if confirm is None or confirm.lower() != 'y':
-            print(f'\nUser {action} canceled.')
-            clear_screen()
             return None
 
         return first_name, last_name, address, phone_number, username, hashed_password
@@ -173,9 +171,9 @@ def get_user_info(db_connection, is_create=True):
 
 def get_input(prompt, is_phone=False, is_confirm=False, is_username=False):
     while True:
-        user_input = input(prompt + '\n> ')
+        user_input = input(f'Enter {prompt} (type "exit" to cancel): ' + '\n> ')
         if user_input.lower() == 'exit':
-            print('\nUser creation cancelled.')
+            print('\nAction cancelled.')
             clear_screen()
             return None
         elif not user_input:
@@ -184,8 +182,8 @@ def get_input(prompt, is_phone=False, is_confirm=False, is_username=False):
         elif is_phone and not user_input.isdigit():
             print('Invalid phone number. Please enter only digits.\n')
             continue
-        elif is_confirm and user_input.lower() not in ['y', 'n']:
-            print('Please enter "y" for yes or "n" for no.\n')
+        elif is_confirm and user_input.lower() not in ['y', 'exit']:
+            print('Please enter "y" for yes or "exit" for cancel the operation.\n')
             continue
         elif is_username and not user_input.isalnum():
             print('Invalid username. Please use only letters and numbers.\n')
@@ -197,7 +195,7 @@ def get_input(prompt, is_phone=False, is_confirm=False, is_username=False):
 
 def get_unique_username(db_connection):
     while True:
-        username = get_input('Enter username (type "exit" to cancel): ', is_username=True)
+        username = get_input('username', is_username=True)
 
         try:
             with db_connection.cursor() as cursor:
