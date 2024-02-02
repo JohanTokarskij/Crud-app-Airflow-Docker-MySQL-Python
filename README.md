@@ -13,7 +13,6 @@ This project, the Hybrid SQL-NoSQL Message Management System, is a robust applic
 
 ## Prerequisites
 - **Python Compatibility**: Developed and tested with **Python 3.12.0**. Compatibility with other versions may vary.
-- **Dependencies**: Ensure all packages listed in `requirements.txt` are installed.
 
 
 ## Initial Setup (First-time Run)
