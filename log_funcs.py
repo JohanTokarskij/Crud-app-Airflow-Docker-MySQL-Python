@@ -25,9 +25,10 @@ def write_to_excel(username):
 
         need_to_update_count = False
         for row_number, row in enumerate(sheet.iter_rows(min_row=2, values_only=True), start=2):
-            excel_row_string = f"{row[0]}-{row[1]:02}-{row[2]:02} {row[3][:2]} {row[4]}"
-
-            if current_timestamp_username == excel_row_string:
+            excel_row = f"{row[0]}-{row[1]:02}-{row[2]:02} {row[3][:2]} {row[4]}"
+            #print('current timestamp, username', current_timestamp_username)
+            #print('excel row', excel_row)
+            if current_timestamp_username == excel_row:
                 need_to_update_count = True
                 current_count_cell = sheet.cell(row=row_number, column=6)
                 current_count_cell.value += 1
@@ -35,7 +36,7 @@ def write_to_excel(username):
         if not need_to_update_count:
             date_part, hour_part = timestamp.split(' ')
             year, month, day = date_part.split('-')
-            row = [int(year), int(month), int(day), f'{int(hour_part)}:00 - {int(hour_part)}:59', username, 1]
+            row = [int(year), int(month), int(day), f'{int(hour_part):02}:00 - {int(hour_part):02}:59', username, 1]
             sheet.append(row)
         workbook.save(PATH_TO_XLSX)
     else:
@@ -57,7 +58,7 @@ def write_to_excel(username):
             for (username, timestamp_slice), count in counts_per_hour.items():
                 date_part, hour_part = timestamp_slice.split(' ')
                 year, month, day = date_part.split('-')
-                row = [int(year), int(month), int(day), f'{int(hour_part)}:00 - {int(hour_part)}:59', username, count]
+                row = [int(year), int(month), int(day), f'{int(hour_part):02}:00 - {int(hour_part):02}:59', username, count]
                 sheet.append(row)
 
             workbook.save(PATH_TO_XLSX)

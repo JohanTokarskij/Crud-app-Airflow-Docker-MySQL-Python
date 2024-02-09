@@ -23,7 +23,6 @@ def csv_to_sql():
                     database='crud_app') as connection:
                 with connection.cursor() as cursor:
                     for row in csv_data:
-                        # Check if the record already exists
                         cursor.execute("""
                             SELECT COUNT(*)
                             FROM logs
@@ -76,7 +75,8 @@ dag = DAG(
     default_args=default_args,
     description='This hourly DAG transfers user login logs from a CSV to a MySQL database.',
     schedule_interval=timedelta(hours=1),
-    catchup=False
+    catchup=False,
+    max_active_runs=1
 )
 
 csv_to_sql_task = PythonOperator(

@@ -1,5 +1,6 @@
 import os
 from time import sleep
+import questionary
 
 ## HELPER FUNCTIONS #
 def clear_screen(sleep_value=0.75):
@@ -8,6 +9,6 @@ def clear_screen(sleep_value=0.75):
 
 def wait_for_keypress(sleep_value=0):
     while True:
-        input('\nPress "Enter" to continue...')
+        questionary.press_any_key_to_continue().ask()
         clear_screen(sleep_value)
         break

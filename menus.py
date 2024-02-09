@@ -1,36 +1,39 @@
+import questionary
+from time import sleep
 from pymysql_funcs import create_user, login, update_user_details, delete_account
 from pymongo_funcs import post_message, search_messages, view_message_statistics
 from helper_funcs import clear_screen
-from time import sleep
 
 
 def initial_menu(db_connection, mongodb_connection):
     while True:
         print('\n' + '*' * 40)
         print('MAIN MENU'.center(40))
-        print('*' * 40)
-        
-        print('\n1. Create User')
-        print('2. Login')
-        print('3. Exit')
-        
-        print('\n' + '*' * 40 + '\n')
+        print('*' * 40)        
 
-        choice = input('Enter your choice (1-3): ')
+        choice = questionary.select(
+            "Enter your choice:",
+            choices=[
+                "1. Create User",
+                "2. Login",
+                "3. Exit"
+            ], qmark='').ask()
 
-        if choice == '1':
+        if choice == "1. Create User":
             create_user(db_connection)
-        elif choice == '2':
+        elif choice == "2. Login":
             username = login(db_connection)
             if username:
-                authenticated_menu(db_connection, mongodb_connection, username)
-        elif choice == '3':
+                should_exit = authenticated_menu(db_connection, mongodb_connection, username)
+                if should_exit:
+                    break
+        elif choice == "3. Exit":
             print('\nExiting the application.')
             sleep(0.75)
             break
-        else:
-            print('\nInvalid choice. Please try again.')
+        elif choice is None:
             clear_screen()
+            break
 
 def authenticated_menu(db_connection, posts, username):
     while True:
@@ -38,35 +41,34 @@ def authenticated_menu(db_connection, posts, username):
         print('AUTHENTICATED MENU'.center(40))
         print('*' * 40)
 
-        print(f'\nWelcome back, {username}!')
+        print(f'\nWelcome back, {username}!\n')
 
-        print('\n1. Post a Message')
-        print('2. Search Messages')
-        print('3. View Message Statistics')
-        print('4. Update User Details')
-        print('5. Delete account')
-        print('6. Logout')
+        choice = questionary.select(
+            "Enter your choice:",
+            choices=[
+                "1. Post a Message",
+                "2. Search Messages",
+                "3. View Message Statistics",
+                "4. Update User Details",
+                "5. Delete account",
+                "6. Logout"
+            ], qmark='').ask()
 
-        print('\n' + '*' * 40 + '\n')
-
-        choice = input('Enter your choice (1-6): ')
-
-        if choice == '1':
+        if choice == "1. Post a Message":
             post_message(posts, username)
-        elif choice == '2':
+        elif choice == "2. Search Messages":
             search_messages(posts)
-        elif choice == '3':
+        elif choice == "3. View Message Statistics":
             view_message_statistics(posts)
-        elif choice == '4':
+        elif choice == "4. Update User Details":
             update_user_details(db_connection, username)
-        elif choice == '5':
+        elif choice == "5. Delete account":
             delete_account(db_connection, username)
             break
-        elif choice == '6':
+        elif choice == "6. Logout":
             print('\nLogging out.')
             clear_screen()
             break
-        else:
-            print('\nInvalid choice. Please try again.')
+        elif choice is None:
             clear_screen()
-
+            return True
