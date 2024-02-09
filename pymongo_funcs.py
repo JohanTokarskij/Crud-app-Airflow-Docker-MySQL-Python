@@ -1,17 +1,21 @@
-from pymongo import MongoClient
-from pymongo.errors import ConnectionFailure, PyMongoError
+from time import sleep
 import os
 import base64
+import questionary
+from pymongo import MongoClient
+from pymongo.errors import ConnectionFailure, PyMongoError
 from helper_funcs import wait_for_keypress, clear_screen
-from time import sleep
 
-UPLOAD_FOLDER = os.path.join('.','Uploads')
+UPLOAD_FOLDER = os.path.join('.', 'Uploads')
 DOWNLOAD_FOLDER = os.path.join('.', 'Downloads')
 
 # MongoDB Database Connection #
+
+
 def establish_mongodb_connection():
     try:
-        client = MongoClient('mongodb://mongoadmin:mongopassword@localhost:27017')
+        client = MongoClient(
+            'mongodb://mongoadmin:mongopassword@localhost:27017')
 
         client.server_info()
 
@@ -32,30 +36,33 @@ def establish_mongodb_connection():
 # Authenticated Menu: 1.Post a Message #
 def post_message(posts, username):
     try:
-        title = input('Enter the title of your post or leave blank to cancel: ' + '\n> ')
-        if title == '' :
+        title = input(
+            'Enter the title of your post or leave blank to cancel: ' + '\n> ')
+        if title == '':
             print('\nAction cancelled.')
             clear_screen()
             return None
-        
-        message = input('Enter your message or leave blank to cancel: ' + '\n> ')
-        if message == '' :
+
+        message = input(
+            'Enter your message or leave blank to cancel: ' + '\n> ')
+        if message == '':
             print('\nAction cancelled.')
             clear_screen()
             return None
-        
 
         if not os.path.exists(UPLOAD_FOLDER):
             os.makedirs(UPLOAD_FOLDER)
 
-        files = os.listdir(UPLOAD_FOLDER)
+        file_list = os.listdir(UPLOAD_FOLDER)
 
         file_data = None
-        if files:
-            file_name = files[0]
-            while True:
-                to_upload = input(f'Found "{file_name}" in Uploads. Upload and remove it? (y/n): ' + '\n> ')
-                if to_upload.lower() == 'y':
+        if file_list:
+            chosen_files_to_upload = questionary.checkbox(
+                f'{len(file_list)} files found in {UPLOAD_FOLDER}. Select files to upload:',
+                choices=file_list, qmark='').ask()
+            file_data_list = []
+            if chosen_files_to_upload:
+                for file_name in chosen_files_to_upload:
                     file_path = os.path.join(UPLOAD_FOLDER, file_name)
 
                     with open(file_path, 'rb') as file:
@@ -68,22 +75,16 @@ def post_message(posts, username):
                         'extension': os.path.splitext(file_name)[1]
                     }
 
-                    os.remove(file_path)
-                    break
-                if to_upload.lower() == 'n':
-                    break
-                else:
-                    print('Please choose "y" and "n"!\n')
-                
+                    file_data_list.append(file_data)
 
-        post_document = {
-            'username': username,
-            'title': title,
-            'message': message,
-            'file': file_data
-        }
+            post_document = {
+                'username': username,
+                'title': title,
+                'message': message,
+                'files': file_data_list
+            }
 
-        posts.insert_one(post_document)
+            posts.insert_one(post_document)
 
         print('\nPost created successfully.')
         clear_screen()
@@ -103,7 +104,8 @@ def post_message(posts, username):
 # Authenticated Menu: 2.Search Messages #
 def search_messages(posts):
     try:
-        search_query = input('\nEnter a keyword in the title or leave blank to cancel: ' + '\n> ')
+        search_query = input(
+            '\nEnter a keyword in the title or leave blank to cancel: ' + '\n> ')
 
         if search_query == '':
             print('\nAction cancelled.')
@@ -115,46 +117,40 @@ def search_messages(posts):
         })
 
         print(f'\nSearch results for "{search_query}":')
-        
+
         results = list(cursor)
         if len(results) == 0:
             print(f'No results were found for "{search_query}".')
             wait_for_keypress()
             return
 
-        ask_for_download = False
-        for post in results:
-            print(f'Username: {post["username"]}')
-            print(f'Title: {post["title"]}')
-            print(f'Message: {post["message"]}')
+        # Pagination setup
+        page_size = 5 
+        page_count = len(results) // page_size + (1 if len(results) % page_size > 0 else 0)
+        current_page = 0
 
-            if 'file' in post and post["file"] is not None:
-                ask_for_download = True
-                print(f'File Name: {post["file"].get("name", "N/A")}{post["file"].get("extension", "N/A")}\n')
-            else:
-                print('File: None\n')
-            print("---------------------------------------------------")
-        
-        if ask_for_download:
-            to_download = input('Files found in post. Download them (y/n)?: ' + '\n> ')
-            if to_download.lower() == 'y':
-                if not os.path.exists(DOWNLOAD_FOLDER):
-                    os.makedirs(DOWNLOAD_FOLDER)
-                for post in results:
-                    if 'file' in post and post["file"] is not None:
-                        file_info = post['file']
-                        file_name = file_info.get("name", "N/A")
-                        file_extension = file_info.get("extension", "N/A")
-                        file_path = os.path.join(DOWNLOAD_FOLDER, f'{file_name}{file_extension}')
-                        
-                        print(f"Downloading file: {file_path}")
-                        
-                        if 'base64' in file_info:
-                            file_data = base64.b64decode(file_info['base64'])
-                            with open(file_path, 'wb') as file:
-                                file.write(file_data)
-                        else:
-                            print(f"Error downloading {file_name}{file_extension}")
+        total_posts = len(results)
+
+        while current_page < page_count:
+            clear_screen(0)
+            print(f'\nPage {current_page + 1} of {page_count} (Total posts: {total_posts})\n')
+            start_index = current_page * page_size
+            end_index = start_index + page_size
+            for index, post in enumerate(results[start_index:end_index], start=start_index + 1):
+                print(f'Post #{index}')
+                print(f'Username: {post["username"]}\nTitle: {post["title"]}\nMessage: {post["message"]}')
+                if 'files' in post and post["files"]:
+                    print('Files available for download:')
+                    for file in post['files']:
+                        print(f'- {file.get("name", "N/A")}{file.get("extension", "N/A")}')
+                    if questionary.confirm('Download files from this post?', qmark='').ask():
+                        download_files(post['files'])
+                print("---------------------------------------------------")
+
+            current_page += 1
+            if current_page < page_count and not questionary.confirm('See next page?', qmark='').ask():
+                break
+        print('No more messages to display.')
         wait_for_keypress()
     except PyMongoError as e:
         print(f'\nDatabase error occurred: {e}')
@@ -166,7 +162,8 @@ def search_messages(posts):
 # Authenticated Menu: 3.View Message Statistics #
 def view_message_statistics(posts):
     try:
-        search_query = input('\nEnter username to view post count or leave blank to cancel: ' + '\n> ')
+        search_query = input(
+            '\nEnter username to view post count or leave blank to cancel: ' + '\n> ')
 
         if search_query == '':
             print('\nAction cancelled.')
@@ -186,5 +183,14 @@ def view_message_statistics(posts):
         print(f'\nAn unexpected error occurred: {e}')
         wait_for_keypress()
 
+# Helper functions #
+def download_files(files):
+    if not os.path.exists(DOWNLOAD_FOLDER):
+        os.makedirs(DOWNLOAD_FOLDER)
     
-
+    for file in files:
+        file_path = os.path.join(DOWNLOAD_FOLDER, f'{file["name"]}{file["extension"]}')
+        print(f"Downloading file: {file_path}")
+        file_data = base64.b64decode(file['base64'])
+        with open(file_path, 'wb') as f:
+            f.write(file_data)

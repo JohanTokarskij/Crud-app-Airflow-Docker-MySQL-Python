@@ -63,8 +63,9 @@ def authenticated_menu(db_connection, posts, username):
         elif choice == "4. Update User Details":
             update_user_details(db_connection, username)
         elif choice == "5. Delete account":
-            delete_account(db_connection, username)
-            break
+            acount_deleted = delete_account(db_connection, username)
+            if acount_deleted:
+                break
         elif choice == "6. Logout":
             print('\nLogging out.')
             clear_screen()

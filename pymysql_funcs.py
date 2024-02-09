@@ -1,9 +1,10 @@
-import pymysql
+from time import sleep
 import bcrypt
+import pymysql
+import questionary
 from getpass import getpass
 from log_funcs import log_user_login
 from helper_funcs import clear_screen, wait_for_keypress
-from time import sleep
 
 
 # MySQL Database Connection #
@@ -117,13 +118,13 @@ def update_user_details(db_connection, username):
 def delete_account(db_connection, username):
     current_password = getpass('Enter your current password: ')
     if not verify_password(db_connection, username, current_password):
-        return
+        return False
     try:
-        user_choice = input('Are you sure you want to delete your user account (y/n)?')
-        if user_choice == 'n':
+        user_choice = questionary.confirm('Are you sure you want to delete your user account?', qmark='').ask()
+        if not user_choice:
             print('\nAction cancelled.')
             clear_screen()
-            return
+            return False
         
         with db_connection.cursor() as cursor:
             delete_query = """
@@ -135,12 +136,15 @@ def delete_account(db_connection, username):
         
         print('The account has been deleted.')
         clear_screen()
+        return True
     except pymysql.Error as e:
         print(f'\nDatabase error occurred: {e}')
         wait_for_keypress()
+        return False
     except Exception as e:
         print(f'\nAn error occurred: {e}')
         wait_for_keypress()
+        return False
 
 # Helper functions #
 def get_user_info(db_connection, is_create=True):
@@ -181,8 +185,8 @@ def get_user_info(db_connection, is_create=True):
               Phone number: {phone_number}
               Username: {username if username else '[Not Changed]'}""")
 
-        confirm = get_input(f'"y" to {action} an account. ', is_confirm=True)
-        if confirm is None or confirm.lower() != 'y':
+        confirm = questionary.confirm(f'Proceed to {action} an account? ', qmark='').ask()
+        if not confirm:
             return None
 
         return first_name, last_name, address, phone_number, username, hashed_password
