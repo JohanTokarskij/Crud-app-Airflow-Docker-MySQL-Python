@@ -39,7 +39,7 @@ def initiate_databases_and_tables():
                 cursor.execute(create_logs_table)
             connect.commit()
         print('Database "airflow" is set up and ready.')
-        print('Database "crud_app" with table "users" is set up and ready.')
+        print('Database "crud_app" with necessary tables is set up and ready.')
     except pymysql.Error as e:
         print(f'An error has occured: {e}')
 
