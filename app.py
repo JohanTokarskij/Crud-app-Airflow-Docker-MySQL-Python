@@ -1,6 +1,6 @@
 from pymysql_funcs import establish_mysql_connection
 from pymongo_funcs import establish_mongodb_connection
-from menus import initial_menu
+from menus import main_menu
 from helper_funcs import clear_screen
 import logging
 from time import sleep
@@ -23,7 +23,7 @@ def main():
         mongodb_connection, posts = establish_mongodb_connection()
         clear_screen(0)
         if mysql_connection and mongodb_connection:
-            initial_menu(mysql_connection, posts)
+            main_menu(mysql_connection, posts)
 
     except KeyboardInterrupt:
         print("\nApplication is terminated by user. Exiting application.")

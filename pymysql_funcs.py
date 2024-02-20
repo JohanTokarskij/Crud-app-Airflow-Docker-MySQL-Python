@@ -27,7 +27,7 @@ def establish_mysql_connection():
         return None
 
 
-# Menu: 1.Create User #
+# MAIN MENU: Create User #
 def create_user(db_connection):
     try:
         user_info = get_user_info(db_connection)
@@ -54,7 +54,7 @@ def create_user(db_connection):
         wait_for_keypress()
 
 
-# Menu: 2.Login #
+# MAIN MENU: Login #
 def login(db_connection):
     try:
         username = input(
@@ -72,8 +72,9 @@ def login(db_connection):
 
         if verify_password(db_connection, username, password):
             log_user_login(username)
-            print('\nLogin successful!')
-            clear_screen()
+            print(f'\nLogin successful! Welcome back, {username}!')
+
+            clear_screen(1)
             return username
         else:
             return None
@@ -87,7 +88,7 @@ def login(db_connection):
         return None
     
 
-# Authenticated Menu: Update User Details #
+# ACCOUNT MANAGEMENT: Update User Details #
 def update_user_details(db_connection, username):
     current_password = getpass('Enter your current password: ')
     if not verify_password(db_connection, username, current_password):
@@ -114,7 +115,7 @@ def update_user_details(db_connection, username):
         print(f'\nAn error occurred: {e}')
         wait_for_keypress()
 
-# Authenticated Menu: Delete Account #
+# ACCOUNT MANAGEMENT: Delete Account #
 def delete_account(db_connection, username):
     current_password = getpass('Enter your current password: ')
     if not verify_password(db_connection, username, current_password):
@@ -135,7 +136,7 @@ def delete_account(db_connection, username):
             db_connection.commit()
         
         print('The account has been deleted.')
-        clear_screen()
+        clear_screen(1)
         return True
     except pymysql.Error as e:
         print(f'\nDatabase error occurred: {e}')
@@ -237,6 +238,7 @@ def get_unique_username(db_connection):
                     print('This username already exists. Please enter a different username.\n')
                 else:
                     return username
+                
         except pymysql.Error as e:
             print(f'\nDatabase error occurred: {e}')
             wait_for_keypress()
@@ -280,8 +282,8 @@ def verify_password(db_connection, username, password):
             else:
                 print('\nIncorrect password.')
                 clear_screen()
-                return False
-      
+                return False  
+            
     except pymysql.Error as e:
         print(f'\nDatabase error occurred: {e}')
         wait_for_keypress()

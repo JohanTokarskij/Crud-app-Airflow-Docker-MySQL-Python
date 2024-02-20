@@ -10,8 +10,6 @@ UPLOAD_FOLDER = os.path.join('.', 'Uploads')
 DOWNLOAD_FOLDER = os.path.join('.', 'Downloads')
 
 # MongoDB Database Connection #
-
-
 def establish_mongodb_connection():
     try:
         client = MongoClient(
@@ -24,6 +22,7 @@ def establish_mongodb_connection():
 
         print('Connection to MongoDB is successful')
         sleep(0.5)
+
         return client, posts
     except ConnectionFailure as e:
         print(f'\nMongoDB connection failed: {e}')
@@ -33,7 +32,7 @@ def establish_mongodb_connection():
         return None
 
 
-# Authenticated Menu: 1.Post a Message #
+# MESSAGE BOARD: Post a Message #
 def post_message(posts, username):
     try:
         title = input(
@@ -87,6 +86,7 @@ def post_message(posts, username):
             posts.insert_one(post_document)
 
         print('\nPost created successfully.')
+
         clear_screen()
     except FileNotFoundError:
         print('\nFile not found in the upload directory.')
@@ -101,7 +101,8 @@ def post_message(posts, username):
         print(f'\nAn unexpected error occurred: {e}')
         wait_for_keypress()
 
-# Authenticated Menu: 2.Search Messages #
+
+# MESSAGE BOARD: Search Messages #
 def search_messages(posts):
     try:
         search_query = input(
@@ -159,7 +160,119 @@ def search_messages(posts):
         print(f'\nAn unexpected error occurred: {e}')
         wait_for_keypress()
 
-# Authenticated Menu: 3.View Message Statistics #
+
+# MESSAGE BOARD: Update a Message #
+def edit_message(posts, username):
+    try:
+        search_query = input(
+            '\nEnter a keyword in the title or leave blank to cancel: ' + '\n> ')
+
+        if search_query == '':
+            print('\nAction cancelled.')
+            clear_screen()
+            return None
+
+        cursor = posts.find({
+            'username': username,
+            'title': {'$regex': search_query, '$options': 'i'}
+        })
+
+        results = list(cursor)
+        
+        if len(results) == 0:
+            print('\nNo messages found.')
+            wait_for_keypress()
+            return
+        
+        choices = [f'{index + 1}. {message["title"]}: {message["message"]}' for index, message in enumerate(results)]
+        selection = questionary.select(
+            'Select a message to edit:',
+            choices=choices, qmark=''
+        ).ask()
+
+        if not selection:
+            print("\nAction cancelled.")
+            clear_screen()
+            return
+        
+        selected_index = int(selection.split('.')[0]) - 1
+        selected_post = results[selected_index]
+
+        new_title = input(f'\nCurrent title: "{selected_post['title']}"\nEnter new title (press Enter to keep current): ')
+        if new_title.strip() == '':
+            new_title = selected_post['title']
+
+        new_message = input(f'\nCurrent message: "{selected_post['message']}"\nEnter new message (press Enter to keep current): ')
+        if new_message.strip() == '':
+            new_message = selected_post['message']
+
+        update_data = {'title': new_title,
+                       'message': new_message}
+
+        posts.update_one({'_id': selected_post['_id']}, {'$set': update_data})
+        print('\nMessage updated successfully.')
+
+        clear_screen() 
+    except PyMongoError as e:
+        print(f'\nDatabase error occurred: {e}')
+        wait_for_keypress()
+    except Exception as e:
+        print(f'\nAn unexpected error occurred: {e}')
+        wait_for_keypress()
+
+
+# MESSAGE BOARD: Delete a Message #
+def delete_message(posts, username):
+    try:
+        search_query = input(
+            '\nEnter a keyword in the title or leave blank to cancel: ' + '\n> ')
+
+        if search_query == '':
+            print('\nAction cancelled.')
+            clear_screen()
+            return None
+        
+        cursor = posts.find({
+            'username': username,
+            'title': {'$regex': search_query, '$options': 'i'}
+        })
+
+        results = list(cursor)
+        if len(results) == 0:
+            print('nNo messages found.')
+            wait_for_keypress()
+            return
+        choices = [f'{index + 1}. {message["title"]}: {message["message"]}' for index, message in enumerate(results)]
+        selection = questionary.select(
+            'Select a message to delete:',
+            choices=choices, qmark=''
+        ).ask()
+
+        if not selection:
+            print('\nAction cancelled.')
+            clear_screen()
+            return
+        
+        selected_index = int(selection.split('.')[0]) - 1
+        selected_post = results[selected_index]
+
+        confirm_deletion = questionary.confirm(f'Are you sure you want to delete this message:\n {selected_post["title"]} - {selected_post["message"]}?', default=False).ask()
+        if confirm_deletion:
+            posts.delete_one({'_id': selected_post['_id']})
+            print('\nMessage deleted successfully.')
+        else:
+            print('\nDeletion cancelled')
+        
+        clear_screen()
+    except PyMongoError as e:
+        print(f'\nDatabase error occurred: {e}')
+        wait_for_keypress()
+    except Exception as e:
+        print(f'\nAn unexpected error occurred: {e}')
+        wait_for_keypress()
+
+
+# MESSAGE BOARD: View Message Statistics #
 def view_message_statistics(posts):
     try:
         search_query = input(
@@ -173,7 +286,6 @@ def view_message_statistics(posts):
         result = posts.count_documents({
             'username': search_query
         })
-
         print(f'\nUser "{search_query}" has posted {result} times.')
         wait_for_keypress()
     except PyMongoError as e:
@@ -182,6 +294,7 @@ def view_message_statistics(posts):
     except Exception as e:
         print(f'\nAn unexpected error occurred: {e}')
         wait_for_keypress()
+
 
 # Helper functions #
 def download_files(files):

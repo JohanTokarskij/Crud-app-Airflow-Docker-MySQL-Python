@@ -34,7 +34,7 @@ def initiate_databases_and_tables():
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     username VARCHAR(100),
                     timestamp DATETIME,
-                    FOREIGN KEY (username) REFERENCES users(username)
+                    UNIQUE (username, timestamp)
                 ) COMMENT = 'This table records the timestamps of user logins';"""
                 cursor.execute(create_logs_table)
             connect.commit()

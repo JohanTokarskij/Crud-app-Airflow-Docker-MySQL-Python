@@ -22,26 +22,15 @@ def csv_to_sql():
                     port=3306,
                     database='crud_app') as connection:
                 with connection.cursor() as cursor:
+                    insert_query = """
+                                    INSERT IGNORE INTO logs (username, timestamp) VALUES (%s, %s)
+                                """        
                     for row in csv_data:
-                        cursor.execute("""
-                            SELECT COUNT(*)
-                            FROM logs
-                            WHERE username = %s AND timestamp = %s
-                        """, (row[0], row[1]))
-
-                        result = cursor.fetchone()
-                        if result[0] == 0:
                             try:
-                                insert_query = """
-                                    INSERT INTO logs (username, timestamp) VALUES (%s, %s)
-                                """
                                 cursor.execute(insert_query, (row[0], row[1]))
                             except mysql.connector.Error as e:
                                 print(f'Error inserting data: {e}')
                                 connection.rollback()
-                        else:
-                            print(f'Duplicate record found: {row[0], row[1]}, skipping insertion.')
-
                     connection.commit()
                     print('Data inserted successfully!')
 
