@@ -303,7 +303,7 @@ def download_files(files):
     
     for file in files:
         file_path = os.path.join(DOWNLOAD_FOLDER, f'{file["name"]}{file["extension"]}')
-        print(f"Downloading file: {file_path}")
+        print(f'Downloading file: {file_path}')
         file_data = base64.b64decode(file['base64'])
         with open(file_path, 'wb') as f:
             f.write(file_data)
