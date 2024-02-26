@@ -198,11 +198,11 @@ def edit_message(posts, username):
         selected_index = int(selection.split('.')[0]) - 1
         selected_post = results[selected_index]
 
-        new_title = input(f'\nCurrent title: "{selected_post['title']}"\nEnter new title (press Enter to keep current): ')
+        new_title = input(f'\nCurrent title: "{selected_post["title"]}"\nEnter new title (press Enter to keep current): ')
         if new_title.strip() == '':
             new_title = selected_post['title']
 
-        new_message = input(f'\nCurrent message: "{selected_post['message']}"\nEnter new message (press Enter to keep current): ')
+        new_message = input(f'\nCurrent message: "{selected_post["message"]}"\nEnter new message (press Enter to keep current): ')
         if new_message.strip() == '':
             new_message = selected_post['message']
 
