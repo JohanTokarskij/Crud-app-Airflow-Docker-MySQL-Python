@@ -1,51 +1,31 @@
 import subprocess
 import time
 
+def run_command_with_retry(service_name, command, retries=5):
+    for attempt in range(retries):
+        try:
+            print(f'Starting the service {service_name}, Attempt: {attempt + 1}')
+            subprocess.run(f'docker-compose up -d {service_name}', shell=True, check=True)
 
-def run_command_in_compose(service_name, command):
-    try:
-        compose_command = f'docker-compose exec -T {service_name} /bin/bash -c \"{command}\"'
-        subprocess.run(compose_command, shell=True, check=True)
-    except subprocess.CalledProcessError as e:
-        print(f'An error occurred: {e}')
+            compose_command = f'docker-compose exec -T {service_name} /bin/bash -c \"{command}\"'
+            subprocess.run(compose_command, shell=True, check=True)
+            print(f'Command executed successfully on {service_name}')
+            return
+        except subprocess.CalledProcessError as e:
+            print(f'Attempt {attempt + 1}: An error occurred: {e}')
+            time.sleep(3)
 
-def is_container_running(container_name):
-    try:
-        result = subprocess.run(['docker', 'ps', '--filter', f'name={container_name}', '--format', '{{.Names}}'], stdout=subprocess.PIPE, text=True)
-        return container_name in result.stdout
-    except subprocess.CalledProcessError:
-        return False
+    print(f"Failed to execute command on {service_name} after {retries} attempts.")
 
-def wait_for_containers(container_names, timeout=10):
-    start_time = time.time()
-    while time.time() - start_time < timeout:
-        if all(is_container_running(name) for name in container_names):
-            return True
-        time.sleep(2) 
-    return False
+def initialize_airflow():    
+    # Airflow webserver initialization command
+    airflow_commands = "airflow db migrate && airflow users create --username admin --password password --firstname Admin --lastname User --role Admin --email admin@example.com"
 
-
-def initialize_airflow():
-    # Start the Airflow services
-    try:
-        subprocess.run(f'docker-compose up -d airflow-webserver airflow-scheduler', shell=True, check=True)
-    except subprocess.CalledProcessError as e:
-        print(f'An error occurred: {e}')
-        return
+    # Initialization of Airflow webserver
+    run_command_with_retry('airflow-webserver', airflow_commands)
     
-    # Run the Airflow database upgrade
-    run_command_in_compose('airflow-webserver', 'airflow db migrate')
-
-    # Create an admin user
-    run_command_in_compose('airflow-webserver', 'airflow users create --username admin --password password --firstname Admin --lastname User --role Admin --email admin@example.com')
-
-    # Upgrade the database for the scheduler
-    run_command_in_compose('airflow-scheduler', 'airflow db migrate')
-
-    if wait_for_containers(['airflow-webserver', 'airflow-scheduler']):
-        print('Airflow is set up and ready.')
-    else:
-        print("Error: Airflow containers are not running after setup.")
+    # Initialization of Airflow webscheduler
+    run_command_with_retry('airflow-scheduler', "airflow db migrate")
 
 if __name__ == '__main__':
     initialize_airflow()

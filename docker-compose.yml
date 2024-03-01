@@ -32,6 +32,13 @@ services:
       - _AIRFLOW_WWW_USER_PASSWORD=password
     ports:
       - "8080:8080"
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    restart: always
     volumes:
       - ./dags:/opt/airflow/dags
       - ./logs:/opt/airflow/logs
