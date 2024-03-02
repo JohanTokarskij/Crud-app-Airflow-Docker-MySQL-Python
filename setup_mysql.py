@@ -2,11 +2,10 @@ import pymysql
 import time
 
 
-def initiate_databases_and_tables():
-    max_retries = 5
-    retry_count = 0
-    while retry_count < max_retries:
-        try:    
+def initiate_databases_and_tables(retries=5):
+    for attempt in range(retries):
+        try:
+            print(f'Initializing databases and tables, Attempt: {attempt + 1}')
             with pymysql.connect(user='root',
                                 password='password',
                                 host='localhost',
@@ -42,18 +41,13 @@ def initiate_databases_and_tables():
                     ) COMMENT = 'This table records the timestamps of user logins';"""
                     cursor.execute(create_logs_table)
                 connect.commit()
-            print('Database "airflow" is set up and ready.')
-            print('Database "crud_app" with necessary tables is set up and ready.')
-            break
+            print('Initialization of MySQL is complete.')
+            return
         except pymysql.Error as e:
-            print(f'An error has occured: {e}')
-            retry_count += 1
-            print(f'Retrying... Attempt {retry_count}/{max_retries}')
+            print(f'Attempt {attempt + 1}: An error occurred: {e}')
             time.sleep(3)
 
-    if retry_count == max_retries:
-        print('Failed to set up databases after maximum retries. Please check the MySQL server and try again.')
-
+    print(f'Failed to set up databases after {retries} attempts. Please check the MySQL connection and try again.')
 
 if __name__ == '__main__':
     initiate_databases_and_tables()

@@ -26,8 +26,8 @@ This project, the Hybrid SQL-NoSQL Message Management System, is a robust platfo
 * Activate the virtual environment: `venv\Scripts\activate` on Windows or `source venv/bin/activate` on Linux/macOS
 4. Install the required dependencies: `pip install -r requirements.txt`
 5. Run `docker-compose up -d` in terminal to pull the necessary Docker images and start the containers. Once the pulling is complete, proceed to the next step.
-6. Run `python setup_mysql.py` to set up MySQL. After getting messages that database for "airflow" and "crud_app" are set up and ready proceed to the next step.
-7. Run `python setup_airflow.py` to set up Apache Airflow. After getting a message "Command executed successfully on airflow-webserver" and "Command executed successfully on airflow-scheduler" the initial set up is done!
+6. Run `python setup_mysql.py` for MySQL setup. Proceed after **"Initialization of MySQL is complete."**
+7. Run `python setup_airflow.py` for Airflow setup. When both "airflow-webserver" and "airflow-scheduler" initializations are complete the initial setup is done.
 
 #### To schedule Airflow logging:
 
