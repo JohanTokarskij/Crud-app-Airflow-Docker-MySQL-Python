@@ -12,8 +12,10 @@ def initiate_databases_and_tables(retries=5):
                                 port=3306,
                                 cursorclass=pymysql.cursors.DictCursor) as connect:
                 with connect.cursor() as cursor:
-                    # Creating a database for Airflow
+                    # Creating a database and admin account for Airflow
                     cursor.execute('CREATE DATABASE IF NOT EXISTS airflow')
+                    cursor.execute('CREATE USER "admin" IDENTIFIED BY "password"')
+                    cursor.execute('GRANT ALL PRIVILEGES ON airflow_db.* TO "admin"')
 
                     # Creating a database and tables for crud_app
                     cursor.execute("CREATE DATABASE IF NOT EXISTS crud_app")
