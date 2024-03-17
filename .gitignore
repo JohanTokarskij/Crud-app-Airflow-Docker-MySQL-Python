@@ -1,6 +1,8 @@
-venv/
+venv*/
 __pycache__/
 logs/*
+Downloads/
+Uploads/
 !/logs/.gitkeep
 #logs/user_login.csv
 #logs/login_history.xlsx

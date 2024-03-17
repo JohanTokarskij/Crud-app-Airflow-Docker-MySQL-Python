@@ -25,10 +25,10 @@ def establish_mongodb_connection():
 
         return client, posts
     except ConnectionFailure as e:
-        print(f'\nMongoDB connection failed: {e}')
+        print(f"\nMongoDB connection failed: {e}")
         return None
     except PyMongoError as e:
-        print(f'\nAn error occurred with MongoDB: {e}')
+        print(f"\nAn error occurred with MongoDB: {e}")
         return None
 
 
@@ -52,14 +52,14 @@ def post_message(posts, username):
         if not os.path.exists(UPLOAD_FOLDER):
             os.makedirs(UPLOAD_FOLDER)
 
-        file_list = os.listdir(UPLOAD_FOLDER)
+        upload_folder_content = os.listdir(UPLOAD_FOLDER)
 
         file_data = None
-        if file_list:
+        file_data_list = []
+        if upload_folder_content:
             chosen_files_to_upload = questionary.checkbox(
-                f'{len(file_list)} files found in {UPLOAD_FOLDER}. Select files to upload:',
-                choices=file_list, qmark='').ask()
-            file_data_list = []
+                f"{len(upload_folder_content)} files found in {UPLOAD_FOLDER}. Select files to upload:",
+                choices=upload_folder_content, qmark='').ask()
             if chosen_files_to_upload:
                 for file_name in chosen_files_to_upload:
                     file_path = os.path.join(UPLOAD_FOLDER, file_name)
@@ -76,29 +76,27 @@ def post_message(posts, username):
 
                     file_data_list.append(file_data)
 
-            post_document = {
-                'username': username,
-                'title': title,
-                'message': message,
-                'files': file_data_list
-            }
+        post_document = {
+            'username': username,
+            'title': title,
+            'message': message,
+            'files': file_data_list
+        }
 
-            posts.insert_one(post_document)
-
+        posts.insert_one(post_document)
         print('\nPost created successfully.')
-
         clear_screen()
     except FileNotFoundError:
         print('\nFile not found in the upload directory.')
         wait_for_keypress()
     except OSError as e:
-        print(f'\nAn OS error occurred: {e}')
+        print(f"\nAn OS error occurred: {e}")
         wait_for_keypress()
     except PyMongoError as e:
-        print(f'\nDatabase error occurred: {e}')
+        print(f"\nDatabase error occurred: {e}")
         wait_for_keypress()
     except Exception as e:
-        print(f'\nAn unexpected error occurred: {e}')
+        print(f"\nAn unexpected error occurred: {e}")
         wait_for_keypress()
 
 
@@ -117,11 +115,11 @@ def search_messages(posts):
             'title': {'$regex': search_query, '$options': 'i'}
         })
 
-        print(f'\nSearch results for "{search_query}":')
+        print(f"\nSearch results for '{search_query}':")
 
         results = list(cursor)
         if len(results) == 0:
-            print(f'No results were found for "{search_query}".')
+            print(f"No results were found for '{search_query}'.")
             wait_for_keypress()
             return
 
@@ -134,13 +132,13 @@ def search_messages(posts):
 
         while current_page < page_count:
             clear_screen(0)
-            print(f'\nPage {current_page + 1} of {page_count} (Total posts: {total_posts})\n')
+            print(f"\nPage {current_page + 1} of {page_count} (Total posts: {total_posts})\n")
             start_index = current_page * page_size
             end_index = start_index + page_size
             for index, post in enumerate(results[start_index:end_index], start=start_index + 1):
-                print(f'Post #{index}')
-                print(f'Username: {post["username"]}\nTitle: {post["title"]}\nMessage: {post["message"]}')
-                if 'files' in post and post["files"]:
+                print(f"Post #{index}")
+                print(f"Username: {post['username']}\nTitle: {post['title']}\nMessage: {post['message']}")
+                if 'files' in post and post['files']:
                     print('Files available for download:')
                     for file in post['files']:
                         print(f'- {file.get("name", "N/A")}{file.get("extension", "N/A")}')
@@ -154,10 +152,10 @@ def search_messages(posts):
         print('No more messages to display.')
         wait_for_keypress()
     except PyMongoError as e:
-        print(f'\nDatabase error occurred: {e}')
+        print(f"\nDatabase error occurred: {e}")
         wait_for_keypress()
     except Exception as e:
-        print(f'\nAn unexpected error occurred: {e}')
+        print(f"\nAn unexpected error occurred: {e}")
         wait_for_keypress()
 
 
@@ -184,25 +182,25 @@ def edit_message(posts, username):
             wait_for_keypress()
             return
         
-        choices = [f'{index + 1}. {message["title"]}: {message["message"]}' for index, message in enumerate(results)]
+        choices = [f"{index + 1}. {message['title']}: {message['message']}" for index, message in enumerate(results)]
         selection = questionary.select(
             'Select a message to edit:',
             choices=choices, qmark=''
         ).ask()
 
         if not selection:
-            print("\nAction cancelled.")
+            print('\nAction cancelled.')
             clear_screen()
             return
         
         selected_index = int(selection.split('.')[0]) - 1
         selected_post = results[selected_index]
 
-        new_title = input(f'\nCurrent title: "{selected_post['title']}"\nEnter new title (press Enter to keep current): ')
+        new_title = input(f"\nCurrent title: '{selected_post['title']}'\nEnter new title (press Enter to keep current): ")
         if new_title.strip() == '':
             new_title = selected_post['title']
 
-        new_message = input(f'\nCurrent message: "{selected_post['message']}"\nEnter new message (press Enter to keep current): ')
+        new_message = input(f"\nCurrent message: '{selected_post['message']}'\nEnter new message (press Enter to keep current): ")
         if new_message.strip() == '':
             new_message = selected_post['message']
 
@@ -214,10 +212,10 @@ def edit_message(posts, username):
 
         clear_screen() 
     except PyMongoError as e:
-        print(f'\nDatabase error occurred: {e}')
+        print(f"\nDatabase error occurred: {e}")
         wait_for_keypress()
     except Exception as e:
-        print(f'\nAn unexpected error occurred: {e}')
+        print(f"\nAn unexpected error occurred: {e}")
         wait_for_keypress()
 
 
@@ -239,10 +237,10 @@ def delete_message(posts, username):
 
         results = list(cursor)
         if len(results) == 0:
-            print('nNo messages found.')
+            print('\nNo messages found.')
             wait_for_keypress()
             return
-        choices = [f'{index + 1}. {message["title"]}: {message["message"]}' for index, message in enumerate(results)]
+        choices = [f"{index + 1}. {message['title']}: {message['message']}" for index, message in enumerate(results)]
         selection = questionary.select(
             'Select a message to delete:',
             choices=choices, qmark=''
@@ -256,7 +254,7 @@ def delete_message(posts, username):
         selected_index = int(selection.split('.')[0]) - 1
         selected_post = results[selected_index]
 
-        confirm_deletion = questionary.confirm(f'Are you sure you want to delete this message:\n {selected_post["title"]} - {selected_post["message"]}?', default=False).ask()
+        confirm_deletion = questionary.confirm(f"Are you sure you want to delete this message:\n {selected_post['title']} - {selected_post['message']}?", default=False).ask()
         if confirm_deletion:
             posts.delete_one({'_id': selected_post['_id']})
             print('\nMessage deleted successfully.')
@@ -265,10 +263,10 @@ def delete_message(posts, username):
         
         clear_screen()
     except PyMongoError as e:
-        print(f'\nDatabase error occurred: {e}')
+        print(f"\nDatabase error occurred: {e}")
         wait_for_keypress()
     except Exception as e:
-        print(f'\nAn unexpected error occurred: {e}')
+        print(f"\nAn unexpected error occurred: {e}")
         wait_for_keypress()
 
 
@@ -286,13 +284,13 @@ def view_message_statistics(posts):
         result = posts.count_documents({
             'username': search_query
         })
-        print(f'\nUser "{search_query}" has posted {result} times.')
+        print(f"\nUser '{search_query}' has posted {result} times.")
         wait_for_keypress()
     except PyMongoError as e:
-        print(f'\nDatabase error occurred: {e}')
+        print(f"\nDatabase error occurred: {e}")
         wait_for_keypress()
     except Exception as e:
-        print(f'\nAn unexpected error occurred: {e}')
+        print(f"\nAn unexpected error occurred: {e}")
         wait_for_keypress()
 
 
@@ -302,8 +300,8 @@ def download_files(files):
         os.makedirs(DOWNLOAD_FOLDER)
     
     for file in files:
-        file_path = os.path.join(DOWNLOAD_FOLDER, f'{file["name"]}{file["extension"]}')
-        print(f'Downloading file: {file_path}')
+        file_path = os.path.join(DOWNLOAD_FOLDER, f"{file['name']}{file['extension']}")
+        print(f"Downloading file: {file_path}")
         file_data = base64.b64decode(file['base64'])
         with open(file_path, 'wb') as f:
             f.write(file_data)

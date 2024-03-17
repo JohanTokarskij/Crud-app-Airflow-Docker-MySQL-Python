@@ -46,10 +46,10 @@ def initiate_databases_and_tables(retries=5):
             print('Initialization of MySQL is complete.')
             return
         except pymysql.Error as e:
-            print(f'Attempt {attempt + 1}: An error occurred: {e}')
+            print(f"Attempt {attempt + 1}: An error occurred: {e}")
             time.sleep(3)
 
-    print(f'Failed to set up databases after {retries} attempts. Please check the MySQL connection and try again.')
+    print(f"Failed to set up databases after {retries} attempts. Please check the MySQL connection and try again.")
 
 if __name__ == '__main__':
     initiate_databases_and_tables()

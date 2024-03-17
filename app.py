@@ -26,7 +26,7 @@ def main():
             main_menu(mysql_connection, posts)
 
     except KeyboardInterrupt:
-        print("\nApplication is terminated by user. Exiting application.")
+        print('\nApplication is terminated by user. Exiting application.')
     except Exception as e:
         print(f"\nAn error occurred: {e}")
     finally:

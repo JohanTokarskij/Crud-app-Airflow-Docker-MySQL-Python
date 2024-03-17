@@ -22,7 +22,7 @@ def establish_mysql_connection():
         sleep(0.5)
         return connection
     except pymysql.Error as e:
-        print(f'\nError connecting to MySQL: {e}')
+        print(f"\nError connecting to MySQL: {e}")
         wait_for_keypress()
         return None
 
@@ -47,10 +47,10 @@ def create_user(db_connection):
             clear_screen()
 
     except pymysql.Error as e:
-        print(f'\nDatabase error occurred: {e}')
+        print(f"\nDatabase error occurred: {e}")
         wait_for_keypress()
     except Exception as e:
-        print(f'\nAn error occurred: {e}')
+        print(f"\nAn error occurred: {e}")
         wait_for_keypress()
 
 
@@ -72,18 +72,18 @@ def login(db_connection):
 
         if verify_password(db_connection, username, password):
             log_user_login(username)
-            print(f'\nLogin successful! Welcome back, {username}!')
+            print(f"\nLogin successful! Welcome back, {username}!")
 
             clear_screen(1)
             return username
         else:
             return None
     except pymysql.Error  as e:
-        print(f'\nDatabase error occurred: {e}')
+        print(f"\nDatabase error occurred: {e}")
         wait_for_keypress()
         return None
     except Exception as e:
-        print(f'\nAn unexpected error occurred: {e}')
+        print(f"\nAn unexpected error occurred: {e}")
         wait_for_keypress()
         return None
     
@@ -109,10 +109,10 @@ def update_user_details(db_connection, username):
             clear_screen()
 
     except pymysql.Error as e:
-        print(f'\nDatabase error occurred: {e}')
+        print(f"\nDatabase error occurred: {e}")
         wait_for_keypress()
     except Exception as e:
-        print(f'\nAn error occurred: {e}')
+        print(f"\nAn error occurred: {e}")
         wait_for_keypress()
 
 # ACCOUNT MANAGEMENT: Delete Account #
@@ -139,11 +139,11 @@ def delete_account(db_connection, username):
         clear_screen(1)
         return True
     except pymysql.Error as e:
-        print(f'\nDatabase error occurred: {e}')
+        print(f"\nDatabase error occurred: {e}")
         wait_for_keypress()
         return False
     except Exception as e:
-        print(f'\nAn error occurred: {e}')
+        print(f"\nAn error occurred: {e}")
         wait_for_keypress()
         return False
 
@@ -186,17 +186,17 @@ def get_user_info(db_connection, is_create=True):
               Phone number: {phone_number}
               Username: {username if username else '[Not Changed]'}""")
 
-        confirm = questionary.confirm(f'Proceed to {action} an account? ', qmark='').ask()
+        confirm = questionary.confirm(f"Proceed to {action} an account? ", qmark='').ask()
         if not confirm:
             return None
 
         return first_name, last_name, address, phone_number, username, hashed_password
 
     except pymysql.Error as e:
-        print(f'\nDatabase error occurred: {e}')
+        print(f"\nDatabase error occurred: {e}")
         wait_for_keypress()
     except Exception as e:
-        print(f'\nAn error occurred: {e}')
+        print(f"\nAn error occurred: {e}")
         wait_for_keypress()
 
 
@@ -223,7 +223,6 @@ def get_input(prompt, is_phone=False, is_confirm=False, is_username=False):
             return user_input
 
 
-
 def get_unique_username(db_connection):
     while True:
         username = get_input('username', is_username=True)
@@ -240,10 +239,10 @@ def get_unique_username(db_connection):
                     return username
                 
         except pymysql.Error as e:
-            print(f'\nDatabase error occurred: {e}')
+            print(f"\nDatabase error occurred: {e}")
             wait_for_keypress()
         except Exception as e:
-            print(f'\nAn error occurred: {e}')
+            print(f"\nAn error occurred: {e}")
             wait_for_keypress()
 
 
@@ -269,7 +268,7 @@ def get_password():
 def verify_password(db_connection, username, password):
     try:
         with db_connection.cursor() as cursor:
-            cursor.execute("SELECT password FROM users WHERE username = %s", (username,))
+            cursor.execute('SELECT password FROM users WHERE username = %s', (username,))
             result = cursor.fetchone()
 
             if not result:
@@ -285,11 +284,11 @@ def verify_password(db_connection, username, password):
                 return False  
             
     except pymysql.Error as e:
-        print(f'\nDatabase error occurred: {e}')
+        print(f"\nDatabase error occurred: {e}")
         wait_for_keypress()
         return False
     except Exception as e:
-        print(f'\nAn error occurred: {e}')
+        print(f"\nAn error occurred: {e}")
         wait_for_keypress()
         return False
 
