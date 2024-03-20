@@ -12,9 +12,12 @@ This project, the Hybrid SQL-NoSQL Message Management System, is a robust platfo
 
 
 ## Prerequisites
-- Docker
-- Docker Compose
-- Python 3.8+
+
+Before you begin, ensure you have met the following requirements:
+- **Docker**: Make sure Docker is installed on your system. You can download it from [Docker's official website](https://www.docker.com/products/docker-desktop).
+- **Docker Compose**: Docker Compose is required for managing multi-container Docker applications. Follow the instructions on the [official Docker documentation](https://docs.docker.com/compose/install/) to install Docker Compose.
+- **Python 3.10 or newer**: This project requires Python 3.10 or later. Verify your Python version by running `python --version` or `python3 --version` in your terminal. If you do not have Python 3.10 or later, visit [Python's official website](https://www.python.org/downloads/) to download and install it.
+
 
 
 ## Initial Setup (First-time Run)
